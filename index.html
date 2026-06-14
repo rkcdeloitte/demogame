@@ -187,18 +187,70 @@ body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-di
 .placed .p-face{background:transparent!important;}
 .placed.dying .p-emoji .animal-img{filter:grayscale(0.85) drop-shadow(0 0 7px rgba(255,23,68,0.55))!important;}
 
-/* V / I badge on sidebar cards */
-.v-badge{
-  position:absolute;top:3px;right:3px;font-size:0.36rem;font-weight:900;
-  border-radius:4px;padding:1px 3px;line-height:1.3;pointer-events:none;
-}
-.v-badge.vert {background:rgba(0,230,118,0.14);color:#00e676;border:1px solid rgba(0,230,118,0.28);}
-.v-badge.inv  {background:rgba(255,145,0,0.14); color:#ff9100;border:1px solid rgba(255,145,0,0.28);}
+/* ── SHELTER SCENERY (pre-placed, CSS-drawn) ── */
+.placed.shelter{cursor:default;pointer-events:none;z-index:8;}
+.placed.shelter::after{display:none!important;}
+.placed.shelter .p-label{display:none;}
+.placed.shelter .p-remove{display:none!important;}
 
-/* Shelter items */
-.placed.shelter{cursor:default;}
-.placed.shelter .p-emoji{font-size:2.6rem;animation:none!important;filter:drop-shadow(1px 4px 5px rgba(0,0,0,0.5));}
-.placed.shelter::after{width:52px!important;opacity:0.5!important;}
+/* Burrow — sandy mound with dark hole */
+.shelter-vis{position:relative;display:block;}
+.shelter-vis.burrow-vis{width:78px;height:46px;}
+.shelter-vis.burrow-vis::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:34px;
+  background:radial-gradient(ellipse at 50% 90%, #d4a04a 0%, #a06825 55%, #7a4f18 100%);
+  border-radius:55% 55% 0 0;
+  box-shadow:inset 0 -4px 8px rgba(0,0,0,0.25),0 2px 6px rgba(0,0,0,0.3);
+}
+.shelter-vis.burrow-vis::after{
+  content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:22px;height:15px;
+  background:radial-gradient(ellipse, #080300 30%, #1a0a00 80%);
+  border-radius:50%;
+  box-shadow:0 3px 8px rgba(0,0,0,0.7),inset 0 1px 3px rgba(0,0,0,0.9);
+}
+
+/* Rock shade — boulder with shadow */
+.shelter-vis.rock-vis{width:76px;height:52px;}
+.shelter-vis.rock-vis::before{
+  content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  width:64px;height:44px;
+  background:radial-gradient(ellipse at 35% 30%, #9a9a9a 0%, #6a6a6a 45%, #3a3a3a 80%);
+  border-radius:58% 70% 50% 44% / 60% 55% 45% 40%;
+  box-shadow:3px 5px 10px rgba(0,0,0,0.55),inset -4px -4px 8px rgba(0,0,0,0.35);
+}
+.shelter-vis.rock-vis::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:56px;height:8px;
+  background:rgba(0,0,0,0.3);border-radius:50%;filter:blur(4px);
+}
+
+/* ── CLASSIFY-IT! floating quiz card ── */
+#classifyCard{
+  display:none;position:fixed;z-index:70;
+  background:linear-gradient(145deg,#060c1a,#0c1728);
+  border:2px solid rgba(192,132,252,0.45);border-radius:22px;
+  padding:20px 18px 14px;width:310px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.85),0 0 28px rgba(192,132,252,0.12);
+  animation:popIn 0.36s cubic-bezier(0.34,1.72,0.64,1);
+  left:50%;top:50%;transform:translate(-50%,-52%);
+}
+#classifyCard.show{display:block;}
+.cl-title{font-size:0.54rem;font-weight:900;letter-spacing:2.5px;color:var(--purple);text-transform:uppercase;margin-bottom:8px;}
+.cl-animal{font-size:2.2rem;text-align:center;margin-bottom:4px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));}
+.cl-q{font-family:'Baloo 2',cursive;font-size:1.05rem;color:#d0dcf0;text-align:center;margin-bottom:14px;line-height:1.4;}
+.cl-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.cl-opt{border:2px solid;border-radius:14px;padding:12px 8px;text-align:center;font-family:'Baloo 2',cursive;font-size:0.88rem;font-weight:800;cursor:pointer;transition:all 0.18s;line-height:1.3;}
+.cl-opt.vert{color:#00e676;border-color:rgba(0,230,118,0.35);background:rgba(0,230,118,0.06);}
+.cl-opt.vert:hover{background:rgba(0,230,118,0.14);border-color:#00e676;transform:scale(1.03);}
+.cl-opt.inv {color:#ff9100;border-color:rgba(255,145,0,0.35); background:rgba(255,145,0,0.06);}
+.cl-opt.inv:hover {background:rgba(255,145,0,0.14);border-color:#ff9100;transform:scale(1.03);}
+.cl-fb{text-align:center;font-family:'Baloo 2',cursive;font-size:1.0rem;min-height:30px;margin-bottom:8px;line-height:1.5;color:#4a5a78;display:none;}
+.cl-fb.show{display:block;}
+.cl-fact{font-size:0.82rem;color:#5a7090;line-height:1.5;text-align:center;margin-bottom:6px;display:none;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:10px;}
+.cl-fact.show{display:block;}
+.cl-close{display:none;width:100%;border:none;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:13px;padding:10px;font-family:'Baloo 2',cursive;font-size:0.95rem;color:white;cursor:pointer;margin-top:4px;}
+.cl-close.show{display:block;}
 
 /* Drinking animation — animal bows head to water */
 @keyframes drinkBow{
@@ -272,13 +324,15 @@ body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-di
 #challengeOverlay.group .ch-box{border-color:rgba(192,132,252,0.35);background:linear-gradient(145deg,#0a0618,#170e2a);}
 #challengeOverlay.group .ch-type{color:var(--purple);}
 #challengeOverlay.group .ch-opt:hover{background:rgba(192,132,252,0.12);border-color:rgba(192,132,252,0.45);}
-.ch-q{font-family:'Baloo 2',cursive;font-size:0.93rem;color:#e0e8f8;margin-bottom:14px;line-height:1.45;}
-.ch-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
-.ch-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 7px;text-align:center;font-family:'Baloo 2',cursive;font-size:0.82rem;color:#8a9bb5;cursor:pointer;transition:all 0.2s;}
+.ch-q{font-family:'Baloo 2',cursive;font-size:1.08rem;color:#e0e8f8;margin-bottom:14px;line-height:1.5;}
+.ch-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.ch-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 8px;text-align:center;font-family:'Baloo 2',cursive;font-size:0.92rem;color:#8a9bb5;cursor:pointer;transition:all 0.2s;line-height:1.4;}
 .ch-opt:hover{background:rgba(64,196,255,0.1);border-color:rgba(64,196,255,0.32);color:#c0d8f0;transform:translateY(-2px);}
 .ch-opt.correct{background:rgba(0,230,118,0.13);border-color:rgba(0,230,118,0.4);color:#00e676;}
 .ch-opt.wrong{background:rgba(255,23,68,0.1);border-color:rgba(255,23,68,0.3);}
-.ch-fb{text-align:center;font-size:0.73rem;min-height:28px;margin-bottom:8px;line-height:1.45;color:#4a5a78;}
+.ch-fb{text-align:center;font-size:1.05rem;min-height:28px;margin-bottom:8px;line-height:1.5;color:#4a5a78;}
+.ch-fb.wrong-fb{color:#ff6b6b;font-size:1.1rem;font-weight:700;}
+.ch-fb.right-fb{color:#00e676;font-size:1.1rem;font-weight:700;}
 .ch-btn{display:none;width:100%;background:linear-gradient(135deg,#00c853,#1b5e20);border:none;border-radius:14px;padding:11px;font-family:'Baloo 2',cursive;font-size:0.9rem;color:white;cursor:pointer;box-shadow:0 4px 18px rgba(0,200,83,0.28);transition:transform 0.15s;}
 .ch-btn:hover{transform:translateY(-2px);}
 .ch-skip{display:block;width:100%;border:none;background:transparent;color:#2a3a50;font-size:0.67rem;cursor:pointer;margin-top:6px;}
@@ -402,6 +456,20 @@ body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-di
   </div>
 </div>
 
+<!-- CLASSIFY-IT! CARD -->
+<div id="classifyCard">
+  <div class="cl-title">🔬 Classify It!</div>
+  <div class="cl-animal" id="clAnimal"></div>
+  <div class="cl-q">Does this animal have a <strong>backbone (spine)</strong>?</div>
+  <div class="cl-opts">
+    <button class="cl-opt vert" onclick="answerClassify(true)">🦴 Vertebrate<br><small style="font-size:0.72rem;font-weight:600;opacity:0.8">Has a backbone</small></button>
+    <button class="cl-opt inv"  onclick="answerClassify(false)">🪱 Invertebrate<br><small style="font-size:0.72rem;font-weight:600;opacity:0.8">No backbone</small></button>
+  </div>
+  <div class="cl-fb"   id="clFb"></div>
+  <div class="cl-fact" id="clFact"></div>
+  <button class="cl-close" id="clClose" onclick="closeClassify()">✓ Got it!</button>
+</div>
+
 <!-- WIN SCREEN -->
 <div id="winScreen">
   <canvas id="confettiCanvas"></canvas>
@@ -445,6 +513,7 @@ const BIOMES = {
       {trigger:'eagle', type:'MATHS',q:'Peacock eats 3 snakes/week, eagle eats 2. Together in 2 weeks?',opts:['10 snakes','20 snakes','8 snakes','15 snakes'],correct:0,explain:'(3+2)×2 = 10 snakes! 🦚🦅'},
     ],
     waterIds:['oasis'], plantIds:['grass','cactus','shrub'], herbIds:['mouse','camel','peacock'], predIds:['snake','eagle','fox'],
+    shelterDefs:[{id:'burrow',xFrac:0.38,label:'Sand Burrow'},{id:'rockshade',xFrac:0.70,label:'Rock Shade'}],
     positiveFacts:[
       {needs:['snake','mouse'],   msg:'🐍 Snake hunts mice — food chain working!'},
       {needs:['eagle','snake'],   msg:'🦅 Eagle keeps snake numbers in check!'},
@@ -831,12 +900,13 @@ function switchBiome(id){
   winShown=false; hintHidden=false;
   document.getElementById('chainHint').style.opacity='1';
   drawBg(); updateEcosystem();
+  setTimeout(placeShelters, 120);
 }
 
 function buildSidebar(id){
   const sb=document.getElementById('sidebar'); sb.innerHTML='';
   const items=BIOMES[id].items;
-  const animals=Object.entries(items).filter(([,v])=>v.type!=='plant'&&v.type!=='water');
+  const animals=Object.entries(items).filter(([,v])=>v.type!=='plant'&&v.type!=='water'&&v.type!=='shelter');
   const plants= Object.entries(items).filter(([,v])=>v.type==='plant');
   const waters= Object.entries(items).filter(([,v])=>v.type==='water');
 
@@ -844,17 +914,14 @@ function buildSidebar(id){
     const s=document.createElement('div');s.className='sidebar-section';s.textContent=label;sb.appendChild(s);
     list.forEach(([itemId,info])=>{
       const card=document.createElement('div');card.className='item-card';card.dataset.id=itemId;card.draggable=true;
-      const vBadge = (info.v===true) ? '<span class="v-badge vert">V</span>' : (info.v===false) ? '<span class="v-badge inv">I</span>' : '';
-      card.innerHTML=`${vBadge}<span class="item-emoji">${info.emoji}</span><div class="item-label">${info.label}</div>`;
+      card.innerHTML=`<span class="item-emoji">${info.emoji}</span><div class="item-label">${info.label}</div>`;
       card.addEventListener('dragstart',()=>{ dragging=itemId; ghost.textContent=info.emoji; ghost.style.display='block'; setTimeout(()=>card.classList.add('dragging'),0); });
       card.addEventListener('dragend',()=>{ card.classList.remove('dragging'); dragging=null; ghost.style.display='none'; });
       card.addEventListener('touchstart',e=>{ dragging=itemId; ghost.style.display='block'; ghost.textContent=info.emoji; const t=e.touches[0]; ghost.style.left=t.clientX+'px'; ghost.style.top=t.clientY+'px'; },{passive:true});
       sb.appendChild(card);
     });
   }
-  const shelters=Object.entries(items).filter(([,v])=>v.type==='shelter').map(([k])=>k);
   sec('🦁 Animals',animals); sec('🌿 Plants',plants); sec('💧 Water',waters);
-  if(shelters.length) sec('🏠 Shelters',shelters);
 }
 
 // ── SEASON SYSTEM ─────────────────────────────────────────────
@@ -965,6 +1032,9 @@ function dropItem(itemId,x,y){
   if(info.type!=='water') sfxPlace();
   if(!hintHidden){hintHidden=true;document.getElementById('chainHint').style.opacity='0';}
   updateEcosystem(); checkChallenge(itemId);
+  if(info.v!==undefined && !classifiedAnimals.has(itemId) && Math.random()<0.7){
+    setTimeout(()=>showClassifyQuiz(itemId), 800);
+  }
 }
 
 function removeItem(uid){
@@ -976,6 +1046,29 @@ function clearAll(){
   placed.forEach(p=>p.el.remove()); placed=[]; winShown=false; hintHidden=false;
   document.getElementById('chainHint').style.opacity='1';
   updateEcosystem();
+  setTimeout(placeShelters, 80);
+}
+
+function placeShelters(){
+  const b=BIOMES[currentBiome];
+  if(!b.shelterDefs||!b.shelterDefs.length) return;
+  const dw=dropZone.clientWidth, dh=dropZone.clientHeight; if(!dw||!dh) return;
+  const yL=dh*(HORIZON[currentBiome]||0.5)+dh*0.05;
+  b.shelterDefs.forEach(sd=>{
+    const info=b.items[sd.id]; if(!info) return;
+    const uid='u'+(uidCounter++);
+    const cx=Math.round(dw*sd.xFrac);
+    const el=document.createElement('div');
+    el.className='placed shelter'; el.id=uid;
+    el.style.left=cx+'px'; el.style.top=yL+'px';
+    const visClass=sd.id==='burrow'?'burrow-vis':'rock-vis';
+    el.innerHTML=`<div class="shelter-vis ${visClass}"></div>`;
+    // tooltip on click
+    el.style.pointerEvents='auto';
+    el.addEventListener('click',()=>showFloat(`🏠 ${sd.label} — animals rest here!`,cx+40,yL,'info'));
+    dropZone.appendChild(el);
+    placed.push({id:sd.id,uid,el,x:cx,y:yL,preset:true});
+  });
 }
 
 // ── ECOSYSTEM ENGINE ──────────────────────────────────────────
@@ -1061,7 +1154,7 @@ function updateEcosystem(){
   // Pop display
   const pd=document.getElementById('popDisplay'); pd.innerHTML='';
   Object.entries(counts).filter(([,v])=>v>0).forEach(([id,cnt])=>{
-    const info=items[id]; if(!info)return;
+    const info=items[id]; if(!info||info.type==='shelter')return;
     const r=document.createElement('div'); r.className='pop-row';
     r.innerHTML=`${info.emoji} <span>${cnt}</span>`; pd.appendChild(r);
   });
@@ -1328,6 +1421,60 @@ function sfxSplash(){
 
 function sfxShelter(){
   initAudio(); blip(350,0.14,'sine',0.1); blip(280,0.18,'sine',0.08,0.06);
+}
+
+// ── CLASSIFY-IT! QUIZ ────────────────────────────────────────
+let classifyTarget=null;
+const classifiedAnimals=new Set();
+
+function showClassifyQuiz(itemId){
+  const info=BIOMES[currentBiome].items[itemId];
+  if(!info||info.v===undefined) return;
+  classifyTarget={id:itemId,info};
+  const card=document.getElementById('classifyCard');
+  document.getElementById('clAnimal').textContent=info.emoji+' '+info.label;
+  document.getElementById('clFb').className='cl-fb';
+  document.getElementById('clFb').textContent='';
+  document.getElementById('clFact').className='cl-fact';
+  document.getElementById('clFact').textContent='';
+  document.getElementById('clClose').className='cl-close';
+  card.className='show'; // show
+}
+
+function answerClassify(guessVert){
+  if(!classifyTarget) return;
+  const {id,info}=classifyTarget;
+  const correct=info.v===guessVert;
+  const fb=document.getElementById('clFb');
+  const fact=document.getElementById('clFact');
+  const cls=document.getElementById('clClose');
+  if(correct){
+    fb.className='cl-fb show right-fb';
+    fb.textContent='✅ Correct! Well done!';
+    const vertFact=info.v?`${info.emoji} ${info.label} has a backbone — it's a ${info.type==='predator'?'reptile/mammal/bird':'mammal/bird/reptile'}! 🦴`:`${info.emoji} ${info.label} has NO backbone — it's an invertebrate! 🪱`;
+    fact.className='cl-fact show';
+    fact.textContent=vertFact;
+    addScore(15); sfxCorrect();
+    classifiedAnimals.add(id);
+  } else {
+    fb.className='cl-fb show wrong-fb';
+    fb.textContent=`❌ Not quite! It's actually a ${info.v?'Vertebrate 🦴':'Invertebrate 🪱'}`;
+    const explain=info.v
+      ? `${info.emoji} ${info.label} has a spine (backbone) inside its body — that makes it a vertebrate!`
+      : `${info.emoji} ${info.label} has no bones at all — it's an invertebrate!`;
+    fact.className='cl-fact show';
+    fact.textContent=explain;
+    sfxWrong();
+  }
+  cls.className='cl-close show';
+  // Disable buttons after answer
+  document.querySelectorAll('.cl-opt').forEach(b=>b.style.pointerEvents='none');
+}
+
+function closeClassify(){
+  document.getElementById('classifyCard').className='';
+  document.querySelectorAll('.cl-opt').forEach(b=>b.style.pointerEvents='');
+  classifyTarget=null;
 }
 
 function triggerDrinking(waterX, waterY){
