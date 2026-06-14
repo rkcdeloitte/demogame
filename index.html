@@ -187,6 +187,50 @@ body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-di
 .placed .p-face{background:transparent!important;}
 .placed.dying .p-emoji .animal-img{filter:grayscale(0.85) drop-shadow(0 0 7px rgba(255,23,68,0.55))!important;}
 
+/* V / I badge on sidebar cards */
+.v-badge{
+  position:absolute;top:3px;right:3px;font-size:0.36rem;font-weight:900;
+  border-radius:4px;padding:1px 3px;line-height:1.3;pointer-events:none;
+}
+.v-badge.vert {background:rgba(0,230,118,0.14);color:#00e676;border:1px solid rgba(0,230,118,0.28);}
+.v-badge.inv  {background:rgba(255,145,0,0.14); color:#ff9100;border:1px solid rgba(255,145,0,0.28);}
+
+/* Shelter items */
+.placed.shelter{cursor:default;}
+.placed.shelter .p-emoji{font-size:2.6rem;animation:none!important;filter:drop-shadow(1px 4px 5px rgba(0,0,0,0.5));}
+.placed.shelter::after{width:52px!important;opacity:0.5!important;}
+
+/* Drinking animation — animal bows head to water */
+@keyframes drinkBow{
+  0%  {transform:translateY(0)   rotate(0deg);}
+  18% {transform:translateY(6px) rotate(18deg);}
+  65% {transform:translateY(6px) rotate(18deg);}
+  82% {transform:translateY(2px) rotate(6deg);}
+  100%{transform:translateY(0)   rotate(0deg);}
+}
+.placed.drinking .p-emoji{animation:drinkBow 2.4s ease-in-out !important;}
+.placed.drinking .p-emoji img.animal-img{animation:drinkBow 2.4s ease-in-out !important;}
+
+/* Water ripple on drop */
+@keyframes waterRippleDrop{
+  0%  {transform:scale(0.8);opacity:0.9;}
+  60% {transform:scale(1.25);opacity:0.4;}
+  100%{transform:scale(1.5); opacity:0;}
+}
+.water-drop-ripple{
+  position:absolute;pointer-events:none;z-index:25;
+  width:90px;height:36px;border-radius:50%;
+  border:2px solid rgba(64,196,255,0.7);
+  animation:waterRippleDrop 0.9s ease-out forwards;
+  transform-origin:center center;
+}
+
+/* Shelter hide/emerge */
+@keyframes hideInShelter{0%{transform:scale(1);opacity:1;}80%{transform:scale(0.3);opacity:0.3;}100%{transform:scale(0.05);opacity:0;}}
+@keyframes emergeFromShelter{0%{transform:scale(0.05);opacity:0;}20%{transform:scale(0.3);opacity:0.3;}100%{transform:scale(1);opacity:1;}}
+.in-shelter .p-emoji{animation:hideInShelter 0.6s ease-in forwards!important;}
+.emerging   .p-emoji{animation:emergeFromShelter 0.7s ease-out forwards!important;}
+
 /* WANDER */
 .p-face{display:inline-block;transition:transform 0.3s ease;}
 .placed .p-label{font-size:0.5rem;font-weight:800;color:#c0d0e8;background:rgba(0,0,0,0.72);border:1px solid rgba(255,255,255,0.09);border-radius:8px;padding:2px 6px;white-space:nowrap;margin-top:2px;opacity:0;transition:opacity 0.2s;backdrop-filter:blur(4px);}
@@ -380,16 +424,18 @@ const BIOMES = {
     ground:['#f0c060','#d4882a','#c07820'],
     extras:'dunes',
     items:{
-      snake:  {emoji:'🐍',label:'Saanp',  eats:['mouse','frog'],        eatenBy:['eagle','peacock'],needs:['grass'],        type:'predator'},
-      peacock:{emoji:'🦚',label:'Mor',    eats:['snake','mouse','grass'],eatenBy:['eagle','fox'],   needs:['water','grass'],type:'omnivore'},
-      mouse:  {emoji:'🐭',label:'Chuha',  eats:['grass','shrub'],        eatenBy:['snake','eagle','fox'],needs:['grass'],  type:'herbivore',img:'assets/animals/mouse.png'},
-      camel:  {emoji:'🐪',label:'Ooont',  eats:['cactus','shrub'],       eatenBy:[],               needs:['oasis'],        type:'herbivore'},
-      eagle:  {emoji:'🦅',label:'Cheel',  eats:['snake','mouse','fox'],  eatenBy:[],               needs:['oasis'],        type:'predator',sky:true},
-      fox:    {emoji:'🦊',label:'Lomdi',  eats:['mouse','snake'],        eatenBy:['eagle'],         needs:['oasis'],        type:'predator'},
-      grass:  {emoji:'🌾',label:'Ghaas',  eats:[],eatenBy:['mouse','camel','peacock'],needs:[],    type:'plant'},
-      cactus: {emoji:'🌵',label:'Cactus', eats:[],eatenBy:['camel'],                 needs:[],    type:'plant'},
-      shrub:  {emoji:'🌿',label:'Jhaadi', eats:[],eatenBy:['mouse','camel'],         needs:[],    type:'plant'},
-      oasis:  {emoji:'💧',label:'Oasis',  eats:[],eatenBy:[],                        needs:[],    type:'water'},
+      snake:   {emoji:'🐍',label:'Saanp',   eats:['mouse','frog'],        eatenBy:['eagle','peacock'],needs:['grass'],        type:'predator', v:true},
+      peacock: {emoji:'🦚',label:'Mor',     eats:['snake','mouse','grass'],eatenBy:['eagle','fox'],  needs:['water','grass'],type:'omnivore',  v:true},
+      mouse:   {emoji:'🐭',label:'Chuha',   eats:['grass','shrub'],       eatenBy:['snake','eagle','fox'],needs:['grass'],  type:'herbivore', v:true, img:'assets/animals/mouse.png'},
+      camel:   {emoji:'🐪',label:'Ooont',   eats:['cactus','shrub'],      eatenBy:[],               needs:['oasis'],        type:'herbivore', v:true},
+      eagle:   {emoji:'🦅',label:'Cheel',   eats:['snake','mouse','fox'], eatenBy:[],               needs:['oasis'],        type:'predator',  v:true, sky:true},
+      fox:     {emoji:'🦊',label:'Lomdi',   eats:['mouse','snake'],       eatenBy:['eagle'],         needs:['oasis'],        type:'predator',  v:true},
+      grass:   {emoji:'🌾',label:'Ghaas',   eats:[],eatenBy:['mouse','camel','peacock'],needs:[],   type:'plant'},
+      cactus:  {emoji:'🌵',label:'Cactus',  eats:[],eatenBy:['camel'],                needs:[],    type:'plant'},
+      shrub:   {emoji:'🌿',label:'Jhaadi',  eats:[],eatenBy:['mouse','camel'],        needs:[],    type:'plant'},
+      oasis:   {emoji:'💧',label:'Oasis',   eats:[],eatenBy:[],                       needs:[],    type:'water'},
+      burrow:  {emoji:'🕳️',label:'Bil',     eats:[],eatenBy:[],                       needs:[],    type:'shelter', shelterFor:['fox','mouse','snake']},
+      rockshade:{emoji:'🪨',label:'Chattan',eats:[],eatenBy:[],                       needs:[],    type:'shelter', shelterFor:['camel','peacock','eagle']},
     },
     challenges:[
       {trigger:'snake', type:'MATHS',q:'3 snakes each eat 2 mice per day. How many mice eaten in ONE WEEK?',opts:['28 mice','42 mice','14 mice','21 mice'],correct:1,explain:'3×2×7 = 42 mice! 🐍'},
@@ -412,12 +458,12 @@ const BIOMES = {
     ground:['#1b5e20','#2e7d32','#4a7c4e'],
     extras:'mangrove',
     items:{
-      tiger:   {emoji:'🐯',label:'Bagh',    eats:['deer','croc'],       eatenBy:[],              needs:['water','grass'],  type:'predator'},
-      dolphin: {emoji:'🐬',label:'Susu',    eats:['fish'],              eatenBy:[],              needs:['water'],          type:'predator'},
-      croc:    {emoji:'🐊',label:'Magar',   eats:['fish','crab'],       eatenBy:['tiger'],        needs:['water'],          type:'predator'},
-      crab:    {emoji:'🦀',label:'Kekda',   eats:['algae'],             eatenBy:['croc'],         needs:['water'],          type:'herbivore'},
-      deer:    {emoji:'🦌',label:'Hiran',   eats:['grass','shrub'],     eatenBy:['tiger'],        needs:['grass','water'],  type:'herbivore'},
-      fish:    {emoji:'🐟',label:'Machli',  eats:['algae'],             eatenBy:['croc','dolphin'],needs:['water'],         type:'herbivore'},
+      tiger:   {emoji:'🐯',label:'Bagh',    eats:['deer','croc'],       eatenBy:[],              needs:['water','grass'],  type:'predator', v:true},
+      dolphin: {emoji:'🐬',label:'Susu',    eats:['fish'],              eatenBy:[],              needs:['water'],          type:'predator', v:true},
+      croc:    {emoji:'🐊',label:'Magar',   eats:['fish','crab'],       eatenBy:['tiger'],        needs:['water'],          type:'predator', v:true},
+      crab:    {emoji:'🦀',label:'Kekda',   eats:['algae'],             eatenBy:['croc'],         needs:['water'],          type:'herbivore',v:false},
+      deer:    {emoji:'🦌',label:'Hiran',   eats:['grass','shrub'],     eatenBy:['tiger'],        needs:['grass','water'],  type:'herbivore',v:true},
+      fish:    {emoji:'🐟',label:'Machli',  eats:['algae'],             eatenBy:['croc','dolphin'],needs:['water'],         type:'herbivore',v:true},
       mangrove:{emoji:'🌴',label:'Sundari', eats:[],eatenBy:[],                                  needs:[],                 type:'plant'},
       algae:   {emoji:'🟢',label:'Shaivaal',eats:[],eatenBy:['crab','fish'],                     needs:[],                 type:'plant'},
       grass:   {emoji:'🌾',label:'Ghaas',   eats:[],eatenBy:['deer'],                            needs:[],                 type:'plant'},
@@ -443,12 +489,12 @@ const BIOMES = {
     ground:['#37474f','#546e7a','#78909c'],
     extras:'mountains',
     items:{
-      leopard:  {emoji:'🐆',label:'Himali Tendua',eats:['sheep','deer'],      eatenBy:[],            needs:['water'],    type:'predator'},
-      eagle:    {emoji:'🦅',label:'Cheel',         eats:['rabbit','mouse'],   eatenBy:['leopard'],   needs:[],           type:'predator',sky:true},
-      sheep:    {emoji:'🐑',label:'Bharal',         eats:['grass','shrub'],    eatenBy:['leopard'],   needs:['grass'],    type:'herbivore'},
-      rabbit:   {emoji:'🐇',label:'Khargosh',       eats:['grass'],            eatenBy:['eagle','leopard'],needs:['grass'],type:'herbivore'},
-      bear:     {emoji:'🐻',label:'Bhalu',          eats:['grass','fish','rabbit'],eatenBy:[],        needs:['water'],    type:'omnivore'},
-      butterfly:{emoji:'🦋',label:'Titli',          eats:['shrub'],            eatenBy:[],            needs:['shrub'],    type:'herbivore',sky:true},
+      leopard:  {emoji:'🐆',label:'Himali Tendua',eats:['sheep','deer'],      eatenBy:[],            needs:['water'],    type:'predator', v:true},
+      eagle:    {emoji:'🦅',label:'Cheel',         eats:['rabbit','mouse'],   eatenBy:['leopard'],   needs:[],           type:'predator', v:true, sky:true},
+      sheep:    {emoji:'🐑',label:'Bharal',         eats:['grass','shrub'],    eatenBy:['leopard'],   needs:['grass'],    type:'herbivore',v:true},
+      rabbit:   {emoji:'🐇',label:'Khargosh',       eats:['grass'],            eatenBy:['eagle','leopard'],needs:['grass'],type:'herbivore',v:true},
+      bear:     {emoji:'🐻',label:'Bhalu',          eats:['grass','fish','rabbit'],eatenBy:[],        needs:['water'],    type:'omnivore', v:true},
+      butterfly:{emoji:'🦋',label:'Titli',          eats:['shrub'],            eatenBy:[],            needs:['shrub'],    type:'herbivore',v:false,sky:true},
       pine:     {emoji:'🌲',label:'Cheed',          eats:[],eatenBy:[],                              needs:[],           type:'plant'},
       shrub:    {emoji:'🌿',label:'Jhaadi',         eats:[],eatenBy:['sheep','butterfly'],            needs:[],           type:'plant'},
       grass:    {emoji:'🌾',label:'Ghaas',          eats:[],eatenBy:['sheep','rabbit'],               needs:[],           type:'plant'},
@@ -474,13 +520,13 @@ const BIOMES = {
     ground:['#4e342e','#6d4c41','#8d6e63'],
     extras:'forest',
     items:{
-      tiger:   {emoji:'🐯',label:'Bagh',       eats:['deer','boar'],         eatenBy:[],         needs:['water','grass'],type:'predator'},
-      elephant:{emoji:'🐘',label:'Hathi',      eats:['grass','shrub','tree'],eatenBy:[],         needs:['water'],        type:'herbivore'},
-      deer:    {emoji:'🦌',label:'Chital',     eats:['grass'],               eatenBy:['tiger'],  needs:['grass','water'],type:'herbivore'},
-      boar:    {emoji:'🐗',label:'Jangli Suar',eats:['shrub','grass'],        eatenBy:['tiger'],  needs:['grass'],        type:'herbivore'},
-      monkey:  {emoji:'🐒',label:'Bandar',     eats:['shrub','tree'],         eatenBy:[],         needs:['tree','water'], type:'herbivore'},
-      cobra:   {emoji:'🐍',label:'Nag',        eats:['mouse'],                eatenBy:[],         needs:['grass'],        type:'predator'},
-      mouse:   {emoji:'🐭',label:'Chuha',      eats:['grass'],               eatenBy:['cobra'],  needs:['grass'],        type:'herbivore'},
+      tiger:   {emoji:'🐯',label:'Bagh',       eats:['deer','boar'],         eatenBy:[],         needs:['water','grass'],type:'predator', v:true},
+      elephant:{emoji:'🐘',label:'Hathi',      eats:['grass','shrub','tree'],eatenBy:[],         needs:['water'],        type:'herbivore',v:true},
+      deer:    {emoji:'🦌',label:'Chital',     eats:['grass'],               eatenBy:['tiger'],  needs:['grass','water'],type:'herbivore',v:true},
+      boar:    {emoji:'🐗',label:'Jangli Suar',eats:['shrub','grass'],        eatenBy:['tiger'],  needs:['grass'],        type:'herbivore',v:true},
+      monkey:  {emoji:'🐒',label:'Bandar',     eats:['shrub','tree'],         eatenBy:[],         needs:['tree','water'], type:'herbivore',v:true},
+      cobra:   {emoji:'🐍',label:'Nag',        eats:['mouse'],                eatenBy:[],         needs:['grass'],        type:'predator', v:true},
+      mouse:   {emoji:'🐭',label:'Chuha',      eats:['grass'],               eatenBy:['cobra'],  needs:['grass'],        type:'herbivore',v:true, img:'assets/animals/mouse.png'},
       tree:    {emoji:'🌳',label:'Ped',         eats:[],eatenBy:['monkey','elephant'],            needs:[],               type:'plant'},
       shrub:   {emoji:'🌿',label:'Jhaadi',     eats:[],eatenBy:['boar','monkey','elephant'],     needs:[],               type:'plant'},
       grass:   {emoji:'🌾',label:'Ghaas',      eats:[],eatenBy:['deer','boar'],                  needs:[],               type:'plant'},
@@ -506,12 +552,12 @@ const BIOMES = {
     ground:['#558b2f','#689f38','#8bc34a'],
     extras:'plains',
     items:{
-      frog:  {emoji:'🐸',label:'Mendhak',  eats:[],                   eatenBy:['snake','eagle'],  needs:['water','grass'], type:'herbivore'},
-      snake: {emoji:'🐍',label:'Saanp',    eats:['frog','mouse'],     eatenBy:['eagle'],           needs:['grass'],         type:'predator'},
-      eagle: {emoji:'🦅',label:'Cheel',    eats:['snake','frog','mouse'],eatenBy:[],              needs:[],                type:'predator',sky:true},
-      bat:   {emoji:'🦇',label:'Chamgadar',eats:['tree'],             eatenBy:['eagle'],           needs:['tree','water'],  type:'omnivore',sky:true},
-      bull:  {emoji:'🐂',label:'Bail',     eats:['grain'],            eatenBy:[],                  needs:['grain','water'], type:'herbivore'},
-      mouse: {emoji:'🐭',label:'Chuha',    eats:['grain','grass'],    eatenBy:['snake','eagle'],   needs:['grass'],         type:'herbivore'},
+      frog:  {emoji:'🐸',label:'Mendhak',  eats:[],                   eatenBy:['snake','eagle'],  needs:['water','grass'], type:'herbivore',v:true},
+      snake: {emoji:'🐍',label:'Saanp',    eats:['frog','mouse'],     eatenBy:['eagle'],           needs:['grass'],         type:'predator', v:true},
+      eagle: {emoji:'🦅',label:'Cheel',    eats:['snake','frog','mouse'],eatenBy:[],              needs:[],                type:'predator', v:true, sky:true},
+      bat:   {emoji:'🦇',label:'Chamgadar',eats:['tree'],             eatenBy:['eagle'],           needs:['tree','water'],  type:'omnivore', v:true, sky:true},
+      bull:  {emoji:'🐂',label:'Bail',     eats:['grain'],            eatenBy:[],                  needs:['grain','water'], type:'herbivore',v:true},
+      mouse: {emoji:'🐭',label:'Chuha',    eats:['grain','grass'],    eatenBy:['snake','eagle'],   needs:['grass'],         type:'herbivore',v:true, img:'assets/animals/mouse.png'},
       grain: {emoji:'🌾',label:'Anaj',     eats:[],eatenBy:['mouse','bull'],                       needs:[],                type:'plant'},
       tree:  {emoji:'🌳',label:'Ped',      eats:[],eatenBy:['bat'],                                needs:[],                type:'plant'},
       lotus: {emoji:'🪷',label:'Kamal',    eats:[],eatenBy:[],                                     needs:[],                type:'plant'},
@@ -798,14 +844,17 @@ function buildSidebar(id){
     const s=document.createElement('div');s.className='sidebar-section';s.textContent=label;sb.appendChild(s);
     list.forEach(([itemId,info])=>{
       const card=document.createElement('div');card.className='item-card';card.dataset.id=itemId;card.draggable=true;
-      card.innerHTML=`<span class="item-emoji">${info.emoji}</span><div class="item-label">${info.label}</div>`;
+      const vBadge = (info.v===true) ? '<span class="v-badge vert">V</span>' : (info.v===false) ? '<span class="v-badge inv">I</span>' : '';
+      card.innerHTML=`${vBadge}<span class="item-emoji">${info.emoji}</span><div class="item-label">${info.label}</div>`;
       card.addEventListener('dragstart',()=>{ dragging=itemId; ghost.textContent=info.emoji; ghost.style.display='block'; setTimeout(()=>card.classList.add('dragging'),0); });
       card.addEventListener('dragend',()=>{ card.classList.remove('dragging'); dragging=null; ghost.style.display='none'; });
       card.addEventListener('touchstart',e=>{ dragging=itemId; ghost.style.display='block'; ghost.textContent=info.emoji; const t=e.touches[0]; ghost.style.left=t.clientX+'px'; ghost.style.top=t.clientY+'px'; },{passive:true});
       sb.appendChild(card);
     });
   }
+  const shelters=Object.entries(items).filter(([,v])=>v.type==='shelter').map(([k])=>k);
   sec('🦁 Animals',animals); sec('🌿 Plants',plants); sec('💧 Water',waters);
+  if(shelters.length) sec('🏠 Shelters',shelters);
 }
 
 // ── SEASON SYSTEM ─────────────────────────────────────────────
@@ -880,8 +929,18 @@ function dropItem(itemId,x,y){
   const extraClass=isSky?(itemId==='butterfly'?'sky-butterfly':'sky-creature'):'';
   el.className='placed '+info.type+(extraClass?' '+extraClass:''); el.id=uid;
   el.style.left=cx+'px'; el.style.top=cy+'px';
-  if(info.type==='water'){
+  if(info.type==='shelter'){
+    el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><span class="p-emoji">${info.emoji}</span><span class="p-label">${info.label}</span>`;
+    el.addEventListener('click',e=>{if(!e.target.classList.contains('p-remove')) showFloat(`🏠 Shelter for: ${(info.shelterFor||[]).join(', ')}`,cx+50,cy,'info');});
+  } else if(info.type==='water'){
     el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><div class="water-pool" style="background:${getWaterStyle(itemId)};"><span class="wp-emoji">${info.emoji}</span></div><span class="p-label">${info.label}</span>`;
+    // Water splash SFX + visual ripple
+    sfxSplash();
+    const ripple=document.createElement('div'); ripple.className='water-drop-ripple';
+    ripple.style.left=(cx+5)+'px'; ripple.style.top=(cy+20)+'px';
+    dropZone.appendChild(ripple); setTimeout(()=>ripple.remove(),950);
+    // Trigger drinking animation after 1.5s
+    setTimeout(()=>triggerDrinking(cx,cy),1500);
   } else if(info.type==='plant'){
     el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><div class="grow-beam"></div><span class="p-emoji seedling">🌱</span><span class="p-label">${info.label}</span>`;
     setTimeout(()=>{
@@ -897,10 +956,13 @@ function dropItem(itemId,x,y){
     el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><span class="p-emoji"><span class="p-face">${faceInner}</span></span><span class="p-label">${info.label}</span>`;
     if(!isSky) el.querySelector('.p-emoji').style.animationDelay=(Math.random()*1.5)+'s';
   }
-  el.addEventListener('click',e=>{if(!e.target.classList.contains('p-remove')) showFoodChain(uid,itemId);});
+  if(info.type!=='shelter') el.addEventListener('click',e=>{if(!e.target.classList.contains('p-remove')) showFoodChain(uid,itemId);});
   dropZone.appendChild(el);
   placed.push({id:itemId,uid,el,x:cx,y:cy});
-  addScore(10); showFloat(isSky?'🦅 Soaring!':skyTried?'🌍 On the ground!':'+10',cx+60,cy+40,isSky?'info':skyTried?'info':'good'); sfxPlace();
+  const floatMsg = info.type==='shelter' ? `🏠 ${info.label} placed!` : isSky?'🦅 Soaring!':skyTried?'🌍 On the ground!':'+10';
+  addScore(info.type==='shelter'?5:10);
+  showFloat(floatMsg,cx+60,cy+40,info.type==='shelter'?'info':isSky?'info':skyTried?'info':'good');
+  if(info.type!=='water') sfxPlace();
   if(!hintHidden){hintHidden=true;document.getElementById('chainHint').style.opacity='0';}
   updateEcosystem(); checkChallenge(itemId);
 }
@@ -920,7 +982,7 @@ function clearAll(){
 function updateEcosystem(){
   const b=BIOMES[currentBiome]; const items=b.items;
   const counts={}; Object.keys(items).forEach(k=>counts[k]=placed.filter(p=>p.id===k).length);
-  const total=placed.length; const season=SEASONS[seasonIdx];
+  const total=placed.filter(p=>items[p.id]&&items[p.id].type!=='shelter').length; const season=SEASONS[seasonIdx];
   const warnings=[]; let dying=[];
 
   // 'water' = any water source present; 'grass' = any plant present; else a specific item id
@@ -963,7 +1025,7 @@ function updateEcosystem(){
   const nPlants      = b.plantIds.filter(p=>counts[p]>0).length;   // distinct plant species
   const nHerbs       = b.herbIds.filter(h=>counts[h]>0).length;    // distinct herbivore species
   const nPreds       = b.predIds.filter(p=>counts[p]>0).length;    // distinct predator species
-  const nAnimals     = placed.filter(p=>{const t=items[p.id]&&items[p.id].type;return t&&t!=='plant'&&t!=='water';}).length;
+  const nAnimals     = placed.filter(p=>{const t=items[p.id]&&items[p.id].type;return t&&t!=='plant'&&t!=='water'&&t!=='shelter';}).length;
   const allFed       = nAnimals>0 && dying.length===0;             // sustainability
   let bal=0;
   if(total>0){
@@ -1185,7 +1247,8 @@ function showWin(){
   } else if(!nextBiome){
     nextMsg='<br><br>🌏 You\'ve completed ALL 5 biomes! Master Ecologist! 🏅';
   }
-  document.getElementById('winSub').innerHTML=`You built a balanced <strong>${b.name}</strong> ecosystem with ${placed.length} elements!<br>Final Score: <strong style="color:#ffd700">⭐ ${score} pts</strong>${nextMsg}`;
+  const ecoCount=placed.filter(p=>BIOMES[currentBiome].items[p.id]&&BIOMES[currentBiome].items[p.id].type!=='shelter').length;
+  document.getElementById('winSub').innerHTML=`You built a balanced <strong>${b.name}</strong> ecosystem with ${ecoCount} elements!<br>Final Score: <strong style="color:#ffd700">⭐ ${score} pts</strong>${nextMsg}`;
   document.getElementById('winScreen').classList.add('show'); sfxWin();
   updateBiomePills(); startConfetti();
 }
@@ -1242,6 +1305,65 @@ function sfxCorrect(){ initAudio(); [523,659,784,1047].forEach((f,i)=>blip(f,0.1
 function sfxWrong(){ initAudio(); blip(190,0.26,'sawtooth',0.13); blip(150,0.30,'sawtooth',0.11,0.07); }
 function sfxWin(){ initAudio(); [523,659,784,1047,1319,1047,1319].forEach((f,i)=>blip(f,0.32,'triangle',0.18,i*0.13)); }
 function sfxRank(){ initAudio(); [784,1047,1319].forEach((f,i)=>blip(f,0.22,'sine',0.16,i*0.07)); }
+
+function sfxSplash(){
+  initAudio(); if(!soundOn||!audioCtx) return;
+  // White-noise burst through resonant bandpass — water splash
+  const dur=0.55, t0=audioCtx.currentTime;
+  const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*dur,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+  const src=audioCtx.createBufferSource();
+  src.buffer=buf;
+  const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1400; bp.Q.value=0.6;
+  const g=audioCtx.createGain();
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(0.28,t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  src.connect(bp); bp.connect(g); g.connect(audioCtx.destination);
+  src.start(t0); src.stop(t0+dur+0.05);
+  // Extra drip tones
+  [660,880,520].forEach((f,i)=>blip(f,0.09,'sine',0.08,0.04+i*0.07));
+}
+
+function sfxShelter(){
+  initAudio(); blip(350,0.14,'sine',0.1); blip(280,0.18,'sine',0.08,0.06);
+}
+
+function triggerDrinking(waterX, waterY){
+  const items=BIOMES[currentBiome].items;
+  // Find a nearby ground herbivore/omnivore
+  const candidates=placed.filter(p=>{
+    const inf=items[p.id]; if(!inf) return false;
+    return (inf.type==='herbivore'||inf.type==='omnivore') && !inf.sky && !p.el.classList.contains('dying');
+  });
+  if(!candidates.length) return;
+  // Pick closest
+  const drinker=candidates.reduce((a,b)=>Math.abs(a.x-waterX)<Math.abs(b.x-waterX)?a:b);
+  const origX=drinker.x;
+  const targetX=waterX-10;
+  const dur=Math.max(1.0, Math.abs(targetX-origX)/60);
+  // Walk to water
+  drinker.el.style.transition=`left ${dur}s linear`;
+  const face=drinker.el.querySelector('.p-face');
+  if(face) face.style.transform=`scaleX(${targetX<origX?-1:1})`;
+  drinker.el.style.left=targetX+'px';
+  drinker.x=targetX;
+  // Drink
+  setTimeout(()=>{
+    drinker.el.classList.add('drinking');
+    showFloat('💧 Drinking!',targetX+50,waterY-30,'info');
+    // sip sounds
+    blip(440,0.06,'sine',0.06); setTimeout(()=>blip(400,0.06,'sine',0.05),300); setTimeout(()=>blip(360,0.06,'sine',0.04),600);
+    // Walk back
+    setTimeout(()=>{
+      drinker.el.classList.remove('drinking');
+      drinker.el.style.transition=`left ${dur}s linear`;
+      if(face) face.style.transform=`scaleX(${origX<targetX?-1:1})`;
+      drinker.el.style.left=origX+'px'; drinker.x=origX;
+    },2600);
+  }, dur*1000+100);
+}
 // Unlock audio on first user gesture (browser autoplay policy)
 window.addEventListener('pointerdown',initAudio,{once:true});
 window.addEventListener('touchstart',initAudio,{once:true});
@@ -1252,11 +1374,38 @@ function wanderTick(){
   const items=BIOMES[currentBiome].items;
   const dw=dropZone.clientWidth, dh=dropZone.clientHeight; if(!dw) return;
   const minY=dh*(HORIZON[currentBiome]||0.5);
+  // Shelters: occasionally send matching animals to hide
+  const shelters=placed.filter(p=>items[p.id]&&items[p.id].type==='shelter');
   placed.forEach(p=>{
     const info=items[p.id]; if(!info) return;
-    if(info.type==='plant'||info.type==='water') return;
-    if(p.el.classList.contains('dying')) return;
+    if(info.type==='plant'||info.type==='water'||info.type==='shelter') return;
+    if(p.el.classList.contains('dying')||p.el.classList.contains('in-shelter')||p.el.classList.contains('emerging')) return;
     if(Math.random()<0.4) return;
+    // 12% chance: head to matching shelter
+    if(Math.random()<0.12 && shelters.length){
+      const matching=shelters.filter(s=>(items[s.id].shelterFor||[]).includes(p.id));
+      if(matching.length){
+        const sh=matching[Math.floor(Math.random()*matching.length)];
+        const dur=Math.max(1.2,Math.abs(sh.x-p.x)/45);
+        p.el.style.transition=`left ${dur}s linear`;
+        const face=p.el.querySelector('.p-face');
+        if(face) face.style.transform=`scaleX(${sh.x<p.x?-1:1})`;
+        p.el.style.left=sh.x+'px'; p.x=sh.x;
+        // Hide in shelter after arriving
+        setTimeout(()=>{
+          p.el.classList.add('in-shelter');
+          sfxShelter();
+          // Emerge after 3–5s
+          const hideTime=3000+Math.random()*2000;
+          setTimeout(()=>{
+            p.el.classList.remove('in-shelter');
+            p.el.classList.add('emerging');
+            setTimeout(()=>p.el.classList.remove('emerging'),750);
+          }, hideTime);
+        }, dur*1000+100);
+        return; // skip normal wander this tick
+      }
+    }
     if(info.sky){
       // Sky creatures drift freely in 2D across the sky band
       const xRange=60+Math.random()*160;
