@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🌿 Bharat Ecosystem Builder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#00e676;--red:#ff1744;--blue:#40c4ff;--orange:#ff9100;
+  --dark:#07090f;--panel:#0d1020;--star:#ffd740;--white:#f0f4ff;
+  --gold:#f5a623;--purple:#c084fc;--teal:#26c6da;
+}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;}
+body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-direction:column;}
+
+/* ── BIOME PICKER ── */
+#biomePicker{
+  display:flex;align-items:center;gap:6px;padding:6px 14px;
+  background:linear-gradient(180deg,#000 0%,rgba(5,7,14,0.97) 100%);
+  border-bottom:1px solid rgba(255,215,64,0.12);
+  flex-shrink:0;overflow-x:auto;z-index:40;scrollbar-width:none;
+}
+#biomePicker::-webkit-scrollbar{display:none;}
+.biome-pill{
+  background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:22px;padding:5px 14px;font-family:'Baloo 2',cursive;font-size:0.73rem;
+  color:#5a6a8a;cursor:pointer;white-space:nowrap;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;
+}
+.biome-pill:hover:not(.locked){
+  background:rgba(255,215,64,0.08);border-color:rgba(255,215,64,0.35);
+  color:var(--star);transform:translateY(-2px);
+  box-shadow:0 4px 14px rgba(255,215,64,0.12);
+}
+.biome-pill.active{
+  border-color:var(--star);color:var(--star);font-size:0.77rem;
+  background:rgba(255,215,64,0.09);
+  box-shadow:0 0 18px rgba(255,215,64,0.22),inset 0 0 8px rgba(255,215,64,0.04);
+}
+.biome-pill.locked{opacity:0.3;cursor:not-allowed;filter:grayscale(0.9);}
+.biome-pill.locked:hover{transform:none;box-shadow:none;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#5a6a8a;}
+
+/* WIN HINTS */
+#winHints{display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;padding:4px 6px;font-size:0.59rem;min-height:20px;}
+#winHints span{white-space:nowrap;padding:2px 8px;border-radius:10px;font-weight:800;letter-spacing:0.3px;}
+#winHints .hint-ok{color:#00e676;background:rgba(0,230,118,0.09);border:1px solid rgba(0,230,118,0.22);}
+#winHints .hint-no{color:#ff9100;background:rgba(255,145,0,0.07);border:1px solid rgba(255,145,0,0.18);}
+
+/* ── TOP BAR ── */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 16px;
+  background:linear-gradient(180deg,rgba(0,0,0,0.97) 0%,rgba(5,7,14,0.93) 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;z-index:30;gap:10px;
+  box-shadow:0 2px 20px rgba(0,0,0,0.5);
+}
+#gameTitle{
+  font-family:'Baloo 2',cursive;font-size:0.98rem;white-space:nowrap;
+  background:linear-gradient(90deg,#ffd740,#ff9100);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+#balanceMeter{flex:1;max-width:220px;}
+#balLabel{font-size:0.52rem;color:#3a4a60;margin-bottom:3px;text-align:center;text-transform:uppercase;letter-spacing:1.2px;}
+#balTrack{height:12px;background:rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 2px 5px rgba(0,0,0,0.4);}
+#balFill{height:100%;width:0%;border-radius:12px;transition:width 0.65s cubic-bezier(0.34,1,0.64,1),background 0.65s;background:#555;position:relative;}
+#balFill.live::after{content:'';position:absolute;top:1px;bottom:1px;right:0;width:5px;background:rgba(255,255,255,0.75);border-radius:0 4px 4px 0;box-shadow:0 0 8px rgba(255,255,255,0.9);}
+#balText{font-size:0.59rem;text-align:center;margin-top:3px;color:#4a5a78;font-weight:800;letter-spacing:0.5px;}
+#seasonWrap{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+#seasonBtn{background:rgba(38,198,218,0.07);border:1.5px solid rgba(38,198,218,0.18);border-radius:16px;padding:4px 10px;font-size:0.67rem;color:var(--teal);cursor:pointer;white-space:nowrap;font-family:'Baloo 2',cursive;transition:all 0.18s;}
+#seasonBtn:hover{border-color:var(--blue);background:rgba(64,196,255,0.12);box-shadow:0 0 12px rgba(64,196,255,0.18);}
+#seasonBadge{font-size:0.65rem;background:rgba(64,196,255,0.07);border:1px solid rgba(64,196,255,0.18);border-radius:12px;padding:3px 8px;color:#6ab4e8;white-space:nowrap;}
+#soundBtn{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:50%;width:32px;height:32px;font-size:0.88rem;color:#4a5a78;cursor:pointer;flex-shrink:0;transition:all 0.18s;display:flex;align-items:center;justify-content:center;}
+#soundBtn:hover{border-color:var(--star);color:var(--star);}
+#scoreArea{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+#scorePill{background:linear-gradient(135deg,rgba(245,166,35,0.12),rgba(255,145,0,0.06));border:1.5px solid rgba(255,215,64,0.3);border-radius:20px;padding:3px 12px;font-family:'Baloo 2',cursive;font-size:0.83rem;color:var(--star);white-space:nowrap;transition:transform 0.22s;box-shadow:0 0 12px rgba(255,215,64,0.08);}
+#rankBadge{font-size:0.55rem;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.25);border-radius:10px;padding:2px 7px;color:var(--purple);white-space:nowrap;transition:transform 0.3s;}
+
+/* ── MAIN ── */
+#main{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:92px;
+  background:linear-gradient(180deg,rgba(4,6,12,0.99) 0%,rgba(7,9,18,0.98) 100%);
+  border-right:1px solid rgba(255,255,255,0.06);
+  display:flex;flex-direction:column;overflow-y:auto;padding:8px 5px;gap:4px;flex-shrink:0;z-index:20;
+  scrollbar-width:thin;scrollbar-color:rgba(255,215,64,0.15) transparent;
+}
+#sidebar::-webkit-scrollbar{width:3px;}
+#sidebar::-webkit-scrollbar-thumb{background:rgba(255,215,64,0.15);border-radius:3px;}
+.sidebar-section{font-size:0.43rem;color:rgba(255,255,255,0.22);font-weight:900;text-transform:uppercase;letter-spacing:1.5px;text-align:center;padding:3px 0 2px;margin-top:5px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.item-card{
+  background:linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018));
+  border:1.5px solid rgba(255,255,255,0.09);
+  border-radius:12px;padding:7px 4px 5px;text-align:center;cursor:grab;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;
+}
+.item-card:hover,.item-card:active{
+  background:linear-gradient(145deg,rgba(255,215,64,0.11),rgba(255,145,0,0.05));
+  border-color:rgba(255,215,64,0.4);
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 10px 22px rgba(0,0,0,0.55),0 0 14px rgba(255,215,64,0.18);
+}
+.item-card.dragging{opacity:0.25;transform:scale(0.87);}
+.item-emoji{font-size:1.75rem;display:block;line-height:1.1;margin-bottom:2px;}
+.item-label{font-size:0.44rem;font-weight:800;color:#3a4a60;letter-spacing:0.5px;text-transform:uppercase;}
+
+/* ── CANVAS ── */
+#canvasWrap{flex:1;position:relative;overflow:hidden;}
+#bgCanvas{position:absolute;inset:0;width:100%;height:100%;}
+#rainCanvas{position:absolute;inset:0;pointer-events:none;z-index:4;display:none;}
+#vignette{position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,transparent 50%,rgba(0,0,0,0.4) 100%);}
+#dropZone{position:absolute;inset:0;z-index:5;}
+
+/* PLACED ITEMS */
+.placed{
+  position:absolute;z-index:10;display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transform-origin:bottom center;user-select:none;
+  animation:dropIn 0.52s cubic-bezier(0.34,1.75,0.5,1);
+}
+.placed:hover{z-index:15;}
+@keyframes dropIn{
+  0%{transform:translateY(-55px) scale(0.25) rotate(-8deg);opacity:0}
+  60%{opacity:1}80%{transform:translateY(5px) scale(1.06) rotate(1deg)}
+  100%{transform:translateY(0) scale(1) rotate(0);opacity:1}
+}
+.placed:not(.water)::after{
+  content:'';position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  width:46px;height:13px;background:rgba(0,0,0,0.38);border-radius:50%;
+  filter:blur(4.5px);z-index:-1;
+}
+.placed .p-emoji{font-size:2.85rem;display:block;filter:drop-shadow(2px 6px 7px rgba(0,0,0,0.65));animation:idleFloat 2.8s ease-in-out infinite;}
+.placed.plant .p-emoji{animation:plantSway 3.2s ease-in-out infinite;}
+@keyframes idleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes plantSway{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-2px)}}
+
+/* WATER POOLS */
+.placed.water{transform-origin:center center;}
+.water-pool{width:112px;height:46px;border-radius:50%;position:relative;box-shadow:0 10px 26px rgba(0,0,0,0.5),inset 0 6px 14px rgba(255,255,255,0.55),inset 0 -8px 16px rgba(0,30,60,0.5);animation:poolShimmer 4s ease-in-out infinite;overflow:hidden;}
+.water-pool::before{content:'';position:absolute;top:14%;left:-45%;width:55%;height:26%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.65),transparent);border-radius:50%;animation:poolGlint 4.5s linear infinite;}
+.wp-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.65rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));z-index:2;}
+@keyframes poolShimmer{0%,100%{transform:scaleX(1) scaleY(1)}50%{transform:scaleX(1.05) scaleY(0.94)}}
+@keyframes poolGlint{0%{left:-50%}100%{left:130%}}
+
+/* SEED GROWTH */
+.placed .p-emoji.seedling{font-size:1.5rem;}
+.placed .p-emoji.grown{animation:growPop 0.65s cubic-bezier(.34,1.72,.5,1);}
+@keyframes growPop{0%{transform:scale(0.15) rotate(-20deg)}60%{transform:scale(1.25) rotate(3deg)}100%{transform:scale(1)}}
+.grow-beam{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:50px;height:140px;z-index:-1;pointer-events:none;background:linear-gradient(to bottom,rgba(255,236,150,0) 0%,rgba(255,238,160,0.28) 55%,rgba(255,220,100,0.6) 100%);clip-path:polygon(40% 0,60% 0,100% 100%,0% 100%);animation:beamPulse 1.2s ease-in-out infinite;}
+@keyframes beamPulse{0%,100%{opacity:0.4;filter:brightness(1)}50%{opacity:0.95;filter:brightness(1.3)}}
+
+/* SKY CREATURES */
+.placed.sky-creature{transition:left 2.5s ease-in-out, top 2.5s ease-in-out;}
+.placed.sky-creature::after{display:none!important;}
+.placed.sky-creature .p-emoji{
+  font-size:2.6rem;
+  animation:eagleSoar 3.8s ease-in-out infinite!important;
+  filter:drop-shadow(2px 4px 12px rgba(0,0,0,0.45));
+}
+@keyframes eagleSoar{
+  0%  {transform:translateY(0)    scaleY(1)    rotate(-6deg)  scaleX(1);}
+  15% {transform:translateY(-16px) scaleY(0.88) rotate(-10deg) scaleX(1.04);}
+  35% {transform:translateY(-8px)  scaleY(1.06) rotate(-6deg)  scaleX(0.98);}
+  55% {transform:translateY(10px)  scaleY(0.9)  rotate(-2deg)  scaleX(1.04);}
+  75% {transform:translateY(4px)   scaleY(1.04) rotate(-5deg)  scaleX(0.99);}
+  100%{transform:translateY(0)    scaleY(1)    rotate(-6deg)  scaleX(1);}
+}
+@keyframes butterflyFloat{
+  0%,100%{transform:translateY(0) rotate(-4deg) scaleX(1);}
+  25%{transform:translateY(-10px) rotate(-8deg) scaleX(0.85);}
+  50%{transform:translateY(-4px)  rotate(-3deg) scaleX(1.1);}
+  75%{transform:translateY(6px)   rotate(-6deg) scaleX(0.9);}
+}
+.placed.sky-butterfly .p-emoji{animation:butterflyFloat 2s ease-in-out infinite!important;font-size:2.2rem;}
+
+/* ANIMAL IMAGE (replaces emoji when img asset exists) */
+.p-face img.animal-img{
+  width:62px;height:62px;object-fit:contain;display:block;
+  background:transparent;border:none;outline:none;
+  mix-blend-mode:multiply;
+  filter:drop-shadow(2px 6px 7px rgba(0,0,0,0.4));
+}
+.placed .p-emoji{background:transparent!important;}
+.placed .p-face{background:transparent!important;}
+.placed.dying .p-emoji .animal-img{filter:grayscale(0.85) drop-shadow(0 0 7px rgba(255,23,68,0.55))!important;}
+
+/* WANDER */
+.p-face{display:inline-block;transition:transform 0.3s ease;}
+.placed .p-label{font-size:0.5rem;font-weight:800;color:#c0d0e8;background:rgba(0,0,0,0.72);border:1px solid rgba(255,255,255,0.09);border-radius:8px;padding:2px 6px;white-space:nowrap;margin-top:2px;opacity:0;transition:opacity 0.2s;backdrop-filter:blur(4px);}
+.placed:hover .p-label{opacity:1;}
+.placed .p-remove{position:absolute;top:-7px;right:-7px;background:linear-gradient(135deg,#ff1744,#b71c1c);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:0.72rem;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:900;z-index:20;box-shadow:0 2px 8px rgba(255,23,68,0.5);}
+.placed:hover .p-remove{display:flex;}
+.placed.dying .p-emoji{animation:dying 0.48s ease-in-out infinite!important;filter:grayscale(0.85) drop-shadow(0 0 7px rgba(255,23,68,0.55))!important;}
+@keyframes dying{0%,100%{transform:rotate(-13deg) scale(0.88)}50%{transform:rotate(13deg) scale(0.88)}}
+
+/* POPUPS */
+.float-popup{position:fixed;pointer-events:none;z-index:80;font-family:'Baloo 2',cursive;font-size:0.95rem;padding:7px 16px;border-radius:24px;font-weight:700;animation:floatUp 1.4s ease-out forwards;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,0.5);}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1.08)}100%{opacity:0;transform:translateY(-72px) scale(0.82)}}
+.float-popup.good{background:linear-gradient(135deg,#00c853,#00e676);color:#001a0a;}
+.float-popup.bad,.float-popup.wrong{background:linear-gradient(135deg,#c62828,#ff1744);color:white;}
+.float-popup.info{background:linear-gradient(135deg,#01579b,#0288d1);color:white;}
+
+/* ── BOTTOM PANEL ── */
+#bottomPanel{
+  position:absolute;bottom:0;left:92px;right:0;
+  background:linear-gradient(180deg,rgba(4,6,14,0.92) 0%,rgba(0,0,0,0.98) 100%);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:5px 14px 7px;z-index:25;
+  display:flex;flex-direction:column;gap:3px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 -4px 24px rgba(0,0,0,0.6);
+}
+#bottomRow{display:flex;align-items:center;gap:10px;}
+#feedMsg{font-size:0.73rem;color:#4a5a78;flex:1;line-height:1.35;}
+#feedMsg strong{color:#a0b0d0;}
+#clearBtn{background:rgba(255,23,68,0.06);border:1.5px solid rgba(255,23,68,0.2);border-radius:10px;padding:5px 10px;color:rgba(255,80,80,0.7);font-family:'Baloo 2',cursive;font-size:0.68rem;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.18s;}
+#clearBtn:hover{background:rgba(255,23,68,0.15);border-color:rgba(255,23,68,0.45);color:#ff8080;}
+
+/* ── CHALLENGE ── */
+#challengeOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:90;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(10px);}
+#challengeOverlay.show{opacity:1;pointer-events:all;}
+.ch-box{background:linear-gradient(145deg,#060c1a,#0c1728);border:1.5px solid rgba(64,196,255,0.3);border-radius:24px;padding:22px 20px;max-width:370px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,0.88),0 0 32px rgba(64,196,255,0.07);animation:popIn 0.38s cubic-bezier(0.34,1.72,0.64,1);}
+@keyframes popIn{from{transform:scale(0.52) translateY(22px);opacity:0}to{transform:scale(1);opacity:1}}
+.ch-type{font-size:0.57rem;font-weight:900;letter-spacing:2.5px;color:var(--blue);margin-bottom:6px;text-transform:uppercase;}
+#challengeOverlay.group .ch-box{border-color:rgba(192,132,252,0.35);background:linear-gradient(145deg,#0a0618,#170e2a);}
+#challengeOverlay.group .ch-type{color:var(--purple);}
+#challengeOverlay.group .ch-opt:hover{background:rgba(192,132,252,0.12);border-color:rgba(192,132,252,0.45);}
+.ch-q{font-family:'Baloo 2',cursive;font-size:0.93rem;color:#e0e8f8;margin-bottom:14px;line-height:1.45;}
+.ch-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.ch-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 7px;text-align:center;font-family:'Baloo 2',cursive;font-size:0.82rem;color:#8a9bb5;cursor:pointer;transition:all 0.2s;}
+.ch-opt:hover{background:rgba(64,196,255,0.1);border-color:rgba(64,196,255,0.32);color:#c0d8f0;transform:translateY(-2px);}
+.ch-opt.correct{background:rgba(0,230,118,0.13);border-color:rgba(0,230,118,0.4);color:#00e676;}
+.ch-opt.wrong{background:rgba(255,23,68,0.1);border-color:rgba(255,23,68,0.3);}
+.ch-fb{text-align:center;font-size:0.73rem;min-height:28px;margin-bottom:8px;line-height:1.45;color:#4a5a78;}
+.ch-btn{display:none;width:100%;background:linear-gradient(135deg,#00c853,#1b5e20);border:none;border-radius:14px;padding:11px;font-family:'Baloo 2',cursive;font-size:0.9rem;color:white;cursor:pointer;box-shadow:0 4px 18px rgba(0,200,83,0.28);transition:transform 0.15s;}
+.ch-btn:hover{transform:translateY(-2px);}
+.ch-skip{display:block;width:100%;border:none;background:transparent;color:#2a3a50;font-size:0.67rem;cursor:pointer;margin-top:6px;}
+
+/* ── WIN SCREEN ── */
+#winScreen{
+  position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:100;opacity:0;pointer-events:none;transition:opacity 0.55s;text-align:center;padding:24px;
+  background:radial-gradient(ellipse at 50% 35%,rgba(16,8,0,0.97) 0%,rgba(0,0,4,0.99) 100%);
+}
+#winScreen.show{opacity:1;pointer-events:all;}
+#confettiCanvas{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.win-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;}
+.win-glow{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,215,64,0.1) 0%,transparent 70%);pointer-events:none;z-index:1;animation:glowPulse 2.2s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.18);opacity:1}}
+.win-emoji{font-size:4.5rem;animation:winBounce 0.65s ease infinite alternate;margin-bottom:6px;filter:drop-shadow(0 0 22px rgba(255,215,64,0.55));}
+@keyframes winBounce{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-20px) rotate(4deg)}}
+.win-title{font-family:'Baloo 2',cursive;font-size:2.1rem;background:linear-gradient(90deg,#ffd740,#ff9100,#ffd740);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerText 2.5s linear infinite;margin-bottom:6px;}
+@keyframes shimmerText{0%{background-position:0%}100%{background-position:200%}}
+.win-sub{color:#3a4a60;font-size:0.84rem;margin-bottom:22px;line-height:1.6;max-width:320px;}
+.win-sub strong{color:#8090b0;}
+.win-btn{background:linear-gradient(135deg,#f5a623,#ff6030);border:none;border-radius:18px;padding:13px 32px;font-family:'Baloo 2',cursive;font-size:1rem;color:white;cursor:pointer;box-shadow:0 8px 26px rgba(245,100,35,0.38);transition:transform 0.18s,box-shadow 0.18s;letter-spacing:0.5px;}
+.win-btn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(245,100,35,0.52);}
+
+/* DRAG GHOST */
+#dragGhost{position:fixed;pointer-events:none;z-index:999;font-size:3rem;opacity:0.9;transform:translate(-50%,-50%);display:none;filter:drop-shadow(2px 6px 10px rgba(0,0,0,0.7));}
+
+/* CHAIN HINT */
+#chainHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.78);border:1px solid rgba(255,215,64,0.18);backdrop-filter:blur(10px);border-radius:20px;padding:5px 14px;font-size:0.62rem;color:#3a4a60;z-index:20;pointer-events:none;white-space:nowrap;transition:opacity 0.5s;}
+
+/* FOOD CHAIN */
+#chainOverlay{position:absolute;inset:0;z-index:18;pointer-events:none;opacity:0;transition:opacity 0.4s;}
+#chainOverlay.show{opacity:1;}
+#chainSvg{position:absolute;inset:0;width:100%;height:100%;}
+#chainTooltip{position:fixed;background:rgba(4,6,14,0.96);border:1px solid rgba(255,215,64,0.28);backdrop-filter:blur(14px);border-radius:14px;padding:6px 12px;font-size:0.7rem;color:#8090b0;z-index:22;pointer-events:none;opacity:0;transition:opacity 0.25s;max-width:220px;line-height:1.45;box-shadow:0 8px 28px rgba(0,0,0,0.6);}
+#chainTooltip.show{opacity:1;}
+
+/* RIPPLE */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,215,64,0.22);pointer-events:none;animation:rip 0.55s ease-out forwards;transform:translate(-50%,-50%);}
+@keyframes rip{from{width:0;height:0;opacity:1}to{width:90px;height:90px;opacity:0}}
+
+/* POPULATION */
+#popDisplay{position:absolute;top:10px;right:10px;z-index:20;display:flex;flex-direction:column;gap:3px;}
+.pop-row{background:rgba(0,0,0,0.68);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(6px);border-radius:12px;padding:3px 8px;font-size:0.56rem;color:#2a3a50;display:flex;align-items:center;gap:4px;}
+.pop-row span{font-weight:900;color:#8090b0;}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  #sidebar{width:58px;}
+  #bottomPanel{left:58px;}
+  .item-label{display:none;}
+  .item-emoji{font-size:1.6rem;}
+  .sidebar-section{font-size:0.36rem;letter-spacing:0;}
+  #gameTitle{font-size:0.78rem;}
+  #seasonWrap{display:none;}
+}
+</style>
+</head>
+<body>
+<div id="dragGhost"></div>
+
+<!-- BIOME PICKER -->
+<div id="biomePicker">
+  <button class="biome-pill active" data-biome="thar"       onclick="switchBiome('thar')">🌵 Thar</button>
+  <button class="biome-pill"        data-biome="sundarbans" onclick="switchBiome('sundarbans')">🌊 Sundarbans</button>
+  <button class="biome-pill"        data-biome="himalayas"  onclick="switchBiome('himalayas')">🏔️ Himalayas</button>
+  <button class="biome-pill"        data-biome="deccan"     onclick="switchBiome('deccan')">🌳 Deccan</button>
+  <button class="biome-pill"        data-biome="gangetic"   onclick="switchBiome('gangetic')">🌾 Gangetic</button>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div id="gameTitle">🌿 <span id="biomeName">Thar</span> Ecosystem</div>
+  <div id="balanceMeter">
+    <div id="balLabel">🌿 Ecosystem Balance</div>
+    <div id="balTrack"><div id="balFill"></div></div>
+    <div id="balText">Empty — add some life!</div>
+  </div>
+  <div id="seasonWrap">
+    <button id="seasonBtn" onclick="cycleSeason()">🌦️ Season</button>
+    <span id="seasonBadge">☀️ Summer</span>
+  </div>
+  <button id="soundBtn" onclick="toggleSound()" title="Sound on/off">🔊</button>
+  <div id="scoreArea">
+    <div id="scorePill">⭐ <span id="scoreNum">0</span></div>
+    <div id="rankBadge">🔭 Observer</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="sidebar"></div>
+  <div id="canvasWrap">
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="rainCanvas"></canvas>
+    <div id="vignette"></div>
+    <div id="dropZone"></div>
+    <div id="chainHint">👆 Drag animals &amp; plants to build your ecosystem!</div>
+    <div id="chainOverlay"><svg id="chainSvg"></svg></div>
+    <div id="chainTooltip"></div>
+    <div id="popDisplay"></div>
+    <div id="bottomPanel">
+      <div id="winHints"></div>
+      <div id="bottomRow">
+        <div id="feedMsg">Start by adding <strong>plants 🌿</strong> and <strong>water 💧</strong>!</div>
+        <button id="clearBtn" onclick="clearAll()">🗑️ Clear All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHALLENGE -->
+<div id="challengeOverlay">
+  <div class="ch-box">
+    <div class="ch-type" id="ch-type">🔢 MATHS CHALLENGE</div>
+    <div class="ch-q" id="ch-q"></div>
+    <div class="ch-opts" id="ch-opts"></div>
+    <div class="ch-fb" id="ch-fb"></div>
+    <button class="ch-btn" id="ch-btn" onclick="closeChallenge()">🎉 Continue Building!</button>
+    <button class="ch-skip" onclick="closeChallenge()">Skip</button>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="winScreen">
+  <canvas id="confettiCanvas"></canvas>
+  <div class="win-glow"></div>
+  <div class="win-content">
+    <div class="win-emoji">🏆</div>
+    <div class="win-title">Shabash!</div>
+    <div class="win-sub" id="winSub"></div>
+    <button class="win-btn" id="winBtn">🌿 Build Again!</button>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS & DATA ─────────────────────────────────────────
+
+const BIOMES = {
+  thar:{
+    name:'Thar Desert', emoji:'🌵',
+    sky:['#ff5722','#ff9800','#ffd54f'],
+    ground:['#f0c060','#d4882a','#c07820'],
+    extras:'dunes',
+    items:{
+      snake:  {emoji:'🐍',label:'Saanp',  eats:['mouse','frog'],        eatenBy:['eagle','peacock'],needs:['grass'],        type:'predator'},
+      peacock:{emoji:'🦚',label:'Mor',    eats:['snake','mouse','grass'],eatenBy:['eagle','fox'],   needs:['water','grass'],type:'omnivore'},
+      mouse:  {emoji:'🐭',label:'Chuha',  eats:['grass','shrub'],        eatenBy:['snake','eagle','fox'],needs:['grass'],  type:'herbivore',img:'assets/animals/mouse.png'},
+      camel:  {emoji:'🐪',label:'Ooont',  eats:['cactus','shrub'],       eatenBy:[],               needs:['oasis'],        type:'herbivore'},
+      eagle:  {emoji:'🦅',label:'Cheel',  eats:['snake','mouse','fox'],  eatenBy:[],               needs:['oasis'],        type:'predator',sky:true},
+      fox:    {emoji:'🦊',label:'Lomdi',  eats:['mouse','snake'],        eatenBy:['eagle'],         needs:['oasis'],        type:'predator'},
+      grass:  {emoji:'🌾',label:'Ghaas',  eats:[],eatenBy:['mouse','camel','peacock'],needs:[],    type:'plant'},
+      cactus: {emoji:'🌵',label:'Cactus', eats:[],eatenBy:['camel'],                 needs:[],    type:'plant'},
+      shrub:  {emoji:'🌿',label:'Jhaadi', eats:[],eatenBy:['mouse','camel'],         needs:[],    type:'plant'},
+      oasis:  {emoji:'💧',label:'Oasis',  eats:[],eatenBy:[],                        needs:[],    type:'water'},
+    },
+    challenges:[
+      {trigger:'snake', type:'MATHS',q:'3 snakes each eat 2 mice per day. How many mice eaten in ONE WEEK?',opts:['28 mice','42 mice','14 mice','21 mice'],correct:1,explain:'3×2×7 = 42 mice! 🐍'},
+      {trigger:'camel', type:'SCIENCE',q:'Why do camels have broad flat feet?',opts:['Kick predators','🏜️ Walk on soft sand','Swim in oasis','Dig underground'],correct:1,explain:'Wide flat feet spread weight on soft sand — natural sandshoes! 🐪'},
+      {trigger:'oasis', type:'MATHS',q:'Oasis holds 300L. 2 camels drink 50L each, 4 peacocks drink 5L each. How much LEFT?',opts:['200L','180L','100L','220L'],correct:1,explain:'2×50+4×5=120L drunk. 300−120=180L left! 💧'},
+      {trigger:'mouse', type:'SCIENCE',q:'What happens if ALL snakes are removed from the desert?',opts:['Mice disappear','🐭 Mice overpopulate!','Nothing changes','Eagles leave'],correct:1,explain:'Without predators, prey overpopulates and destroys plants! 🌿'},
+      {trigger:'eagle', type:'MATHS',q:'Peacock eats 3 snakes/week, eagle eats 2. Together in 2 weeks?',opts:['10 snakes','20 snakes','8 snakes','15 snakes'],correct:0,explain:'(3+2)×2 = 10 snakes! 🦚🦅'},
+    ],
+    waterIds:['oasis'], plantIds:['grass','cactus','shrub'], herbIds:['mouse','camel','peacock'], predIds:['snake','eagle','fox'],
+    positiveFacts:[
+      {needs:['snake','mouse'],   msg:'🐍 Snake hunts mice — food chain working!'},
+      {needs:['eagle','snake'],   msg:'🦅 Eagle keeps snake numbers in check!'},
+      {needs:['camel','oasis'],   msg:'🐪 Camel has water — happy desert wanderer!'},
+      {needs:['peacock','grass'], msg:'🦚 Peacock dancing in the grassland!'},
+    ],
+  },
+  sundarbans:{
+    name:'Sundarbans', emoji:'🌊',
+    sky:['#1565c0','#0288d1','#4fc3f7'],
+    ground:['#1b5e20','#2e7d32','#4a7c4e'],
+    extras:'mangrove',
+    items:{
+      tiger:   {emoji:'🐯',label:'Bagh',    eats:['deer','croc'],       eatenBy:[],              needs:['water','grass'],  type:'predator'},
+      dolphin: {emoji:'🐬',label:'Susu',    eats:['fish'],              eatenBy:[],              needs:['water'],          type:'predator'},
+      croc:    {emoji:'🐊',label:'Magar',   eats:['fish','crab'],       eatenBy:['tiger'],        needs:['water'],          type:'predator'},
+      crab:    {emoji:'🦀',label:'Kekda',   eats:['algae'],             eatenBy:['croc'],         needs:['water'],          type:'herbivore'},
+      deer:    {emoji:'🦌',label:'Hiran',   eats:['grass','shrub'],     eatenBy:['tiger'],        needs:['grass','water'],  type:'herbivore'},
+      fish:    {emoji:'🐟',label:'Machli',  eats:['algae'],             eatenBy:['croc','dolphin'],needs:['water'],         type:'herbivore'},
+      mangrove:{emoji:'🌴',label:'Sundari', eats:[],eatenBy:[],                                  needs:[],                 type:'plant'},
+      algae:   {emoji:'🟢',label:'Shaivaal',eats:[],eatenBy:['crab','fish'],                     needs:[],                 type:'plant'},
+      grass:   {emoji:'🌾',label:'Ghaas',   eats:[],eatenBy:['deer'],                            needs:[],                 type:'plant'},
+      river:   {emoji:'🌊',label:'Nadi',    eats:[],eatenBy:[],                                  needs:[],                 type:'water'},
+    },
+    challenges:[
+      {trigger:'tiger',  type:'SCIENCE',q:'Why do tigers swim in the Sundarbans?',opts:['Just for fun','🐯 Cool down & hunt across water','Escape other tigers','Fishing'],correct:1,explain:'Sundarbans tigers are expert swimmers — hunting deer across tidal creeks! 🌊'},
+      {trigger:'dolphin',type:'MATHS',q:'A dolphin eats 8 fish/day. How many in 2 weeks?',opts:['96 fish','112 fish','80 fish','56 fish'],correct:1,explain:'8×14 = 112 fish! 🐬'},
+      {trigger:'croc',   type:'SCIENCE',q:'Crocodile is cold-blooded. What does that mean?',opts:['Feels cold to touch','🌡️ Body temp from surroundings','Lives in cold water','Drinks cold water'],correct:1,explain:'Ectotherms get body heat from environment — that\'s why crocs bask in sunlight! 🐊'},
+      {trigger:'crab',   type:'MATHS',q:'5 crabs each have 8 legs. Total legs?',opts:['35 legs','40 legs','45 legs','50 legs'],correct:1,explain:'5×8 = 40 legs! 🦀'},
+      {trigger:'river',  type:'SCIENCE',q:'Mangrove roots grow upward from mud. Why?',opts:['Look pretty','🌬️ Breathe air (pneumatophores)','Collect rain','Support birds'],correct:1,explain:'Pneumatophores absorb oxygen from air since mud lacks it! 🌴'},
+    ],
+    waterIds:['river'], plantIds:['mangrove','algae','grass'], herbIds:['crab','deer','fish'], predIds:['tiger','dolphin','croc'],
+    positiveFacts:[
+      {needs:['tiger','deer'],   msg:'🐯 Tiger stalks the deer — apex predator at work!'},
+      {needs:['dolphin','fish'], msg:'🐬 Dolphin hunting fish in the river delta!'},
+      {needs:['fish','algae'],   msg:'🐟 Fish feeding on algae — river food chain working!'},
+    ],
+  },
+  himalayas:{
+    name:'Himalayas', emoji:'🏔️',
+    sky:['#1a0a2e','#311b92','#4a148c'],
+    ground:['#37474f','#546e7a','#78909c'],
+    extras:'mountains',
+    items:{
+      leopard:  {emoji:'🐆',label:'Himali Tendua',eats:['sheep','deer'],      eatenBy:[],            needs:['water'],    type:'predator'},
+      eagle:    {emoji:'🦅',label:'Cheel',         eats:['rabbit','mouse'],   eatenBy:['leopard'],   needs:[],           type:'predator',sky:true},
+      sheep:    {emoji:'🐑',label:'Bharal',         eats:['grass','shrub'],    eatenBy:['leopard'],   needs:['grass'],    type:'herbivore'},
+      rabbit:   {emoji:'🐇',label:'Khargosh',       eats:['grass'],            eatenBy:['eagle','leopard'],needs:['grass'],type:'herbivore'},
+      bear:     {emoji:'🐻',label:'Bhalu',          eats:['grass','fish','rabbit'],eatenBy:[],        needs:['water'],    type:'omnivore'},
+      butterfly:{emoji:'🦋',label:'Titli',          eats:['shrub'],            eatenBy:[],            needs:['shrub'],    type:'herbivore',sky:true},
+      pine:     {emoji:'🌲',label:'Cheed',          eats:[],eatenBy:[],                              needs:[],           type:'plant'},
+      shrub:    {emoji:'🌿',label:'Jhaadi',         eats:[],eatenBy:['sheep','butterfly'],            needs:[],           type:'plant'},
+      grass:    {emoji:'🌾',label:'Ghaas',          eats:[],eatenBy:['sheep','rabbit'],               needs:[],           type:'plant'},
+      glacier:  {emoji:'🧊',label:'Himani',         eats:[],eatenBy:[],                              needs:[],           type:'water'},
+    },
+    challenges:[
+      {trigger:'leopard',  type:'SCIENCE',q:'Snow leopards have thick fur. Why?',opts:['Look beautiful','🔥 Trap body heat in cold','Waterproofing','Scare prey'],correct:1,explain:'Thick fur is nature\'s insulation — survives −20°C! 🐆'},
+      {trigger:'eagle',    type:'MATHS',q:'Eagle flies 120 km/h. Rabbit is 2 km away. Seconds to reach it?',opts:['30s','60s','90s','45s'],correct:1,explain:'2÷120 hours = 1/60 hour = 60 seconds! 🦅'},
+      {trigger:'glacier',  type:'SCIENCE',q:'What happens when a glacier melts too fast?',opts:['More water = good','🌊 Floods & habitat loss','Nothing changes','Animals grow bigger'],correct:1,explain:'Flash floods destroy nesting grounds and food sources! 🧊'},
+      {trigger:'bear',     type:'MATHS',q:'Bear eats 20,000 calories before hibernation. 1 berry = 5 cal. How many berries?',opts:['2,000','4,000','400','40,000'],correct:1,explain:'20,000÷5 = 4,000 berries! 🐻'},
+      {trigger:'butterfly',type:'SCIENCE',q:'Butterflies move from Himalayas in winter. This is called?',opts:['Eating more','🦋 Migration — moving seasonally','Growing bigger','Changing colour'],correct:1,explain:'Migration = seasonal movement for survival! 🦋'},
+    ],
+    waterIds:['glacier'], plantIds:['pine','shrub','grass'], herbIds:['sheep','rabbit','butterfly'], predIds:['leopard','eagle','bear'],
+    positiveFacts:[
+      {needs:['leopard','sheep'],  msg:'🐆 Snow leopard stalking bharal — mountain life!'},
+      {needs:['bear','grass'],     msg:'🐻 Bear grazing before hibernation!'},
+      {needs:['butterfly','shrub'],msg:'🦋 Butterflies pollinating mountain shrubs!'},
+    ],
+  },
+  deccan:{
+    name:'Deccan Forest', emoji:'🌳',
+    sky:['#e65100','#f57f17','#558b2f'],
+    ground:['#4e342e','#6d4c41','#8d6e63'],
+    extras:'forest',
+    items:{
+      tiger:   {emoji:'🐯',label:'Bagh',       eats:['deer','boar'],         eatenBy:[],         needs:['water','grass'],type:'predator'},
+      elephant:{emoji:'🐘',label:'Hathi',      eats:['grass','shrub','tree'],eatenBy:[],         needs:['water'],        type:'herbivore'},
+      deer:    {emoji:'🦌',label:'Chital',     eats:['grass'],               eatenBy:['tiger'],  needs:['grass','water'],type:'herbivore'},
+      boar:    {emoji:'🐗',label:'Jangli Suar',eats:['shrub','grass'],        eatenBy:['tiger'],  needs:['grass'],        type:'herbivore'},
+      monkey:  {emoji:'🐒',label:'Bandar',     eats:['shrub','tree'],         eatenBy:[],         needs:['tree','water'], type:'herbivore'},
+      cobra:   {emoji:'🐍',label:'Nag',        eats:['mouse'],                eatenBy:[],         needs:['grass'],        type:'predator'},
+      mouse:   {emoji:'🐭',label:'Chuha',      eats:['grass'],               eatenBy:['cobra'],  needs:['grass'],        type:'herbivore'},
+      tree:    {emoji:'🌳',label:'Ped',         eats:[],eatenBy:['monkey','elephant'],            needs:[],               type:'plant'},
+      shrub:   {emoji:'🌿',label:'Jhaadi',     eats:[],eatenBy:['boar','monkey','elephant'],     needs:[],               type:'plant'},
+      grass:   {emoji:'🌾',label:'Ghaas',      eats:[],eatenBy:['deer','boar'],                  needs:[],               type:'plant'},
+      stream:  {emoji:'💧',label:'Jharna',     eats:[],eatenBy:[],                               needs:[],               type:'water'},
+    },
+    challenges:[
+      {trigger:'tiger',   type:'MATHS',q:'Tiger eats 1 deer every 5 days. How many deer in 30 days?',opts:['4 deer','6 deer','8 deer','5 deer'],correct:1,explain:'30÷5 = 6 deer! 🐯'},
+      {trigger:'elephant',type:'SCIENCE',q:'Elephants are called "ecosystem engineers". Why?',opts:['Build dams','🌱 Dig waterholes & spread seeds in dung','Teach animals','Make forest paths'],correct:1,explain:'Elephant dung plants forests — they dig waterholes other animals drink from! 🐘'},
+      {trigger:'deer',    type:'MATHS',q:'Herd starts at 10 deer. Tigers eat 2/month. How many after 3 months?',opts:['2 deer','4 deer','6 deer','8 deer'],correct:1,explain:'10−(2×3) = 4 deer! 🦌'},
+      {trigger:'cobra',   type:'SCIENCE',q:'Cobras spread their hood when threatened. This is called?',opts:['Dancing','Camouflage','🐍 Defensive display','Hibernation'],correct:2,explain:'Hood spread makes cobra look bigger and scarier! 🐍'},
+      {trigger:'monkey',  type:'MATHS',q:'Monkey eats 5 fruits/day. Tree grows 100 fruits/season (90 days). Can 2 monkeys survive on 1 tree?',opts:['Yes, easily','❌ No, not enough','Exactly enough','Need 3 trees'],correct:1,explain:'2×5×90=900 needed, tree gives 100. Not enough! 🐒'},
+    ],
+    waterIds:['stream'], plantIds:['tree','shrub','grass'], herbIds:['elephant','deer','boar','monkey','mouse'], predIds:['tiger','cobra'],
+    positiveFacts:[
+      {needs:['tiger','deer'],    msg:'🐯 Tiger chasing Chital deer — forest drama!'},
+      {needs:['elephant','tree'], msg:'🐘 Elephant spreading seeds — ecosystem engineer!'},
+      {needs:['monkey','tree'],   msg:'🐒 Monkey swinging through the canopy!'},
+    ],
+  },
+  gangetic:{
+    name:'Indo-Gangetic Plains', emoji:'🌾',
+    sky:['#1565c0','#42a5f5','#b3e5fc'],
+    ground:['#558b2f','#689f38','#8bc34a'],
+    extras:'plains',
+    items:{
+      frog:  {emoji:'🐸',label:'Mendhak',  eats:[],                   eatenBy:['snake','eagle'],  needs:['water','grass'], type:'herbivore'},
+      snake: {emoji:'🐍',label:'Saanp',    eats:['frog','mouse'],     eatenBy:['eagle'],           needs:['grass'],         type:'predator'},
+      eagle: {emoji:'🦅',label:'Cheel',    eats:['snake','frog','mouse'],eatenBy:[],              needs:[],                type:'predator',sky:true},
+      bat:   {emoji:'🦇',label:'Chamgadar',eats:['tree'],             eatenBy:['eagle'],           needs:['tree','water'],  type:'omnivore',sky:true},
+      bull:  {emoji:'🐂',label:'Bail',     eats:['grain'],            eatenBy:[],                  needs:['grain','water'], type:'herbivore'},
+      mouse: {emoji:'🐭',label:'Chuha',    eats:['grain','grass'],    eatenBy:['snake','eagle'],   needs:['grass'],         type:'herbivore'},
+      grain: {emoji:'🌾',label:'Anaj',     eats:[],eatenBy:['mouse','bull'],                       needs:[],                type:'plant'},
+      tree:  {emoji:'🌳',label:'Ped',      eats:[],eatenBy:['bat'],                                needs:[],                type:'plant'},
+      lotus: {emoji:'🪷',label:'Kamal',    eats:[],eatenBy:[],                                     needs:[],                type:'plant'},
+      pond:  {emoji:'🫧',label:'Talab',    eats:[],eatenBy:[],                                     needs:[],                type:'water'},
+    },
+    challenges:[
+      {trigger:'frog', type:'SCIENCE',q:'Frog egg → tadpole → frog. What is this process?',opts:['Migration','🦋 Metamorphosis','Photosynthesis','Hibernation'],correct:1,explain:'Metamorphosis — tadpoles grow legs and lose tails! 🐸'},
+      {trigger:'bat',  type:'SCIENCE',q:'Bats navigate dark using sound waves. Called?',opts:['Radar','Sonar','🦇 Echolocation','Ultrasound vision'],correct:2,explain:'Echolocation — bats send pulses and listen for echoes! 🦇'},
+      {trigger:'pond', type:'MATHS',q:'Pond holds 500L. 3 bulls drink 40L each, 5 frogs need 2L each daily. Days until empty?',opts:['3 days','4 days','5 days','6 days'],correct:1,explain:'3×40+5×2=130L/day. 500÷130≈3.8 → empty day 4! 🫧'},
+      {trigger:'lotus',type:'SCIENCE',q:'Lotus leaves repel water completely. This property is called?',opts:['Waterproofing','🪷 The Lotus Effect (superhydrophobic)','Photosynthesis','Osmosis'],correct:1,explain:'Microscopic bumps make water bead and roll off! 🪷'},
+      {trigger:'bull', type:'MATHS',q:'3 bulls eat 15 kg grass/day each. Field has 1,350 kg. How many days until gone?',opts:['25 days','30 days','35 days','20 days'],correct:1,explain:'3×15=45 kg/day. 1350÷45=30 days! 🐂'},
+    ],
+    waterIds:['pond'], plantIds:['grain','tree','lotus'], herbIds:['frog','bat','bull','mouse'], predIds:['snake','eagle'],
+    positiveFacts:[
+      {needs:['frog','pond'],   msg:'🐸 Frogs singing by the pond — monsoon melody!'},
+      {needs:['snake','frog'],  msg:'🐍 Snake hunting frogs in the paddy field!'},
+      {needs:['eagle','snake'], msg:'🦅 Eagle swoops on a snake — apex predator!'},
+      {needs:['bat','tree'],    msg:'🦇 Bats roosting in trees, eating insects at night!'},
+    ],
+  },
+};
+
+// Collective-noun "group" challenges — fire when 3+ of a species are present.
+// Piloting with mice only; the rest are ready to switch on (researched nouns below):
+//   peacock:ostentation, snake:nest, camel:caravan, eagle:convocation, fox:skulk,
+//   tiger:streak, dolphin:pod, croc:bask, crab:cast, deer:herd, fish:school,
+//   leopard:leap, sheep:flock, rabbit:fluffle, bear:sleuth, butterfly:kaleidoscope,
+//   elephant:parade, boar:sounder, monkey:troop, cobra:quiver, frog:army, bat:cauldron, bull:drove
+const GROUPS = {
+  mouse:    {q:'A whole gang of mice! What do we call a GROUP of mice?',         opts:['A mischief','A herd','A pack','A swarm'],           correct:0, fact:'A group of mice is called a “mischief” — perfect for these cheeky nibblers! 🐭'},
+  camel:    {q:'Three camels together! What is a group of camels called?',        opts:['A caravan','A herd','A flock','A pride'],           correct:0, fact:'A “caravan” of camels — just like the desert trade routes of old! 🐪'},
+  peacock:  {q:'Look at all those peacocks! What is their group called?',         opts:['An ostentation','A flock','A pride','A parliament'], correct:0, fact:'A group of peacocks is an “ostentation” — because they love to show off! 🦚'},
+  snake:    {q:'Snakes slithering together! What do we call a group of snakes?',  opts:['A nest','A pack','A colony','A swarm'],             correct:0, fact:'A “nest” of snakes — sounds spooky but that\'s really what it\'s called! 🐍'},
+  eagle:    {q:'Eagles circling overhead! What is a group of eagles called?',     opts:['A convocation','A flock','A pack','A band'],        correct:0, fact:'A “convocation” of eagles — like a grand assembly of sky kings! 🦅'},
+  fox:      {q:'Foxes running together! What do we call a group of foxes?',       opts:['A skulk','A pack','A herd','A pride'],              correct:0, fact:'A “skulk” of foxes — they are known for being sneaky and sly! 🦊'},
+  tiger:    {q:'Multiple tigers spotted! What is a group of tigers called?',      opts:['A streak','A pride','A pack','A coalition'],        correct:0, fact:'A “streak” of tigers — as fast and fierce as lightning! 🐯'},
+  dolphin:  {q:'Dolphins leaping together! What do we call a group of dolphins?', opts:['A pod','A school','A herd','A shoal'],              correct:0, fact:'A “pod” of dolphins — they travel and hunt together as family! 🐬'},
+  croc:     {q:'Crocodiles basking! What is a group of crocodiles called?',       opts:['A bask','A nest','A swarm','A pack'],               correct:0, fact:'A “bask” of crocodiles — they group together to warm up in sunlight! 🐊'},
+  crab:     {q:'Crabs scuttling together! What do we call a group of crabs?',     opts:['A cast','A swarm','A colony','A herd'],             correct:0, fact:'A “cast” of crabs — they cast their claws wide to catch food! 🦀'},
+  deer:     {q:'Deer grazing together! What is a group of deer called?',          opts:['A herd','A pack','A flock','A pride'],              correct:0, fact:'A “herd” of deer — they stay together for safety in numbers! 🦌'},
+  fish:     {q:'Fish swimming together! What do we call a group of fish?',        opts:['A school','A flock','A pod','A swarm'],             correct:0, fact:'A “school” of fish — they swim in perfect formation, like students! 🐟'},
+  leopard:  {q:'Leopards roaming! What is a group of leopards called?',           opts:['A leap','A pride','A pack','A coalition'],          correct:0, fact:'A “leap” of leopards — named for their incredible jumping ability! 🐆'},
+  sheep:    {q:'Sheep on the hillside! What do we call a group of sheep?',        opts:['A flock','A herd','A pack','A mob'],                correct:0, fact:'A “flock” of sheep — they follow each other very closely! 🐑'},
+  rabbit:   {q:'Rabbits hopping about! What is a group of rabbits called?',       opts:['A fluffle','A burrow','A colony','A pack'],         correct:0, fact:'A “fluffle” of rabbits — possibly the most adorable word in science! 🐇'},
+  bear:     {q:'Bears wandering together! What do we call a group of bears?',     opts:['A sleuth','A pack','A herd','A clan'],              correct:0, fact:'A “sleuth” of bears — because bears are surprisingly good at tracking! 🐻'},
+  butterfly:{q:'Butterflies fluttering! What is a group of butterflies called?',  opts:['A kaleidoscope','A flutter','A swarm','A cloud'],   correct:0, fact:'A “kaleidoscope” of butterflies — their colours swirl like a kaleidoscope! 🦋'},
+  elephant: {q:'Elephants marching! What do we call a group of elephants?',       opts:['A parade','A herd','A march','A troop'],            correct:0, fact:'A “parade” of elephants — when they walk in a line it really looks like one! 🐘'},
+  boar:     {q:'Wild boars charging together! What is a group of boars called?',  opts:['A sounder','A herd','A pack','A mob'],              correct:0, fact:'A “sounder” of boars — named for the snorting sounds they make! 🐗'},
+  monkey:   {q:'Monkeys swinging together! What do we call a group of monkeys?',  opts:['A troop','A gang','A pack','A band'],               correct:0, fact:'A “troop” of monkeys — they live in organised social groups! 🐒'},
+  cobra:    {q:'Cobras slithering together! What is a group of cobras called?',   opts:['A quiver','A nest','A knot','A colony'],            correct:0, fact:'A “quiver” of cobras — their raised hoods quiver when they\'re alarmed! 🐍'},
+  frog:     {q:'Frogs leaping together! What do we call a group of frogs?',       opts:['An army','A colony','A swarm','A cluster'],         correct:0, fact:'An “army” of frogs — they invade ponds in large numbers during monsoon! 🐸'},
+  bat:      {q:'Bats flying at dusk! What is a group of bats called?',            opts:['A cauldron','A colony','A swarm','A flock'],        correct:0, fact:'A “cauldron” of bats — swirling out of caves like something brewing! 🦇'},
+  bull:     {q:'Bulls together in the field! What do we call a group of bulls?',  opts:['A drove','A herd','A pack','A gang'],               correct:0, fact:'A “drove” of bulls — they are driven in groups by farmers! 🐂'},
+};
+
+const SEASONS = ['☀️ Summer','🌧️ Monsoon','❄️ Winter'];
+// fraction of canvas height below which is "ground" (animals/plants can't be placed in sky above this)
+const HORIZON = {thar:0.45, sundarbans:0.46, himalayas:0.55, deccan:0.48, gangetic:0.50};
+const RANKS = [
+  {min:0,   label:'🔭 Observer'},
+  {min:100, label:'🌿 Explorer'},
+  {min:300, label:'🦋 Naturalist'},
+  {min:600, label:'🔬 Scientist'},
+  {min:1000,label:'🏆 Chief Vaijnanik!'},
+];
+
+// ── STATE ─────────────────────────────────────────────────────
+let placed = [];
+let score = 0;
+let challengesDone = new Set();
+let groupsDone = new Set();
+let uidCounter = 0;
+let winShown = false;
+const BIOME_ORDER = ['thar','sundarbans','himalayas','deccan','gangetic'];
+const unlockedBiomes = new Set(['thar']);
+const completedBiomes = new Set();
+let currentBiome = 'thar';
+let seasonIdx = 0;
+let lastRank = 0;
+let hintHidden = false;
+let rainAnim = null;
+
+// ── CANVAS / BACKGROUND ──────────────────────────────────────
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+const rainCanvas = document.getElementById('rainCanvas');
+const rainCtx = rainCanvas.getContext('2d');
+
+function resizeCanvas(){
+  const w = document.getElementById('canvasWrap');
+  canvas.width = w.clientWidth; canvas.height = w.clientHeight;
+  rainCanvas.width = w.clientWidth; rainCanvas.height = w.clientHeight;
+  drawBg();
+}
+
+function drawBg(){
+  const b = BIOMES[currentBiome];
+  const W = canvas.width, H = canvas.height;
+  const season = SEASONS[seasonIdx];
+  ctx.clearRect(0,0,W,H);
+
+  // Sky
+  const sky = ctx.createLinearGradient(0,0,0,H*.6);
+  const isDark = b.sky[0].startsWith('#1a') || b.sky[0].startsWith('#31');
+  const cols = b.sky.map(c => season.includes('Monsoon') ? dimColor(c,25) : season.includes('Winter') ? coolColor(c) : c);
+  sky.addColorStop(0,cols[0]);
+  sky.addColorStop(0.5,cols[1]||cols[0]);
+  sky.addColorStop(1,cols[2]||cols[1]||cols[0]);
+  ctx.fillStyle = sky; ctx.fillRect(0,0,W,H);
+
+  // Sun / Moon
+  if(isDark || season.includes('Winter')){
+    const mx=W*.82,my=H*.1;
+    const halo=ctx.createRadialGradient(mx,my,4,mx,my,60);
+    halo.addColorStop(0,'rgba(220,232,255,0.35)');halo.addColorStop(1,'transparent');
+    ctx.fillStyle=halo;ctx.beginPath();ctx.arc(mx,my,60,0,Math.PI*2);ctx.fill();
+    const mg = ctx.createRadialGradient(mx-6,my-6,2,mx,my,28);
+    mg.addColorStop(0,'#ffffff'); mg.addColorStop(.7,'#e8eeff'); mg.addColorStop(1,'#c7d4f0');
+    ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(mx,my,26,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    for(let i=0;i<22;i++){const sx=(W*.04+i*W*.047)%W,sy=(H*.04+i*i*7)%(H*.42);ctx.beginPath();ctx.arc(sx,sy,i%3?0.9:1.6,0,Math.PI*2);ctx.fill();}
+  } else {
+    const sx = season.includes('Monsoon')?W*.5:W*.8;
+    const sy = H*.12;
+    const sr = season.includes('Monsoon')?22:48;
+    // soft rays
+    if(!season.includes('Monsoon')){
+      ctx.save();ctx.translate(sx,sy);ctx.fillStyle='rgba(255,236,150,0.12)';
+      for(let i=0;i<12;i++){ctx.rotate(Math.PI/6);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-14,sr*2.6);ctx.lineTo(14,sr*2.6);ctx.closePath();ctx.fill();}
+      ctx.restore();
+    }
+    const sg = ctx.createRadialGradient(sx,sy,2,sx,sy,sr);
+    sg.addColorStop(0,'#fffde7'); sg.addColorStop(.5,'#ffe082'); sg.addColorStop(1,'transparent');
+    ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+  }
+
+  // Clouds for daytime skies
+  if(!isDark && !season.includes('Winter')){
+    drawClouds(W,H,season.includes('Monsoon'));
+  }
+
+  const fn = {dunes:drawDunes,mangrove:drawMangrove,mountains:drawMountains,forest:drawForest,plains:drawPlains};
+  (fn[b.extras]||drawPlains)(W,H,b,season);
+}
+
+function drawClouds(W,H,storm){
+  const col=storm?'rgba(70,80,95,0.7)':'rgba(255,255,255,0.6)';
+  const clouds=storm?[[W*.18,H*.14],[W*.46,H*.09],[W*.72,H*.16],[W*.9,H*.22]]:[[W*.22,H*.16],[W*.62,H*.1]];
+  clouds.forEach(([cx,cy])=>{
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.ellipse(cx,cy,40,16,0,0,Math.PI*2);
+    ctx.ellipse(cx+32,cy+5,30,13,0,0,Math.PI*2);
+    ctx.ellipse(cx-30,cy+6,26,12,0,0,Math.PI*2);
+    ctx.ellipse(cx+4,cy-7,24,12,0,0,Math.PI*2);
+    ctx.fill();
+  });
+}
+
+function dimColor(hex,amt){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),bl=parseInt(hex.slice(5,7),16);
+  const c=v=>Math.max(0,Math.min(255,v));
+  return `rgb(${c(r-amt)},${c(g-amt)},${c(bl+amt/2)})`;
+}
+function coolColor(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),bl=parseInt(hex.slice(5,7),16);
+  const c=v=>Math.max(0,Math.min(255,v));
+  return `rgb(${c(r-20)},${c(g-10)},${c(bl+25)})`;
+}
+
+function drawDunes(W,H,b,season){
+  const g=season.includes('Monsoon')?['#b08020','#8a6018','#706010']:b.ground;
+  function dune(y0,y1,col,a){
+    ctx.globalAlpha=a;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,H*y0);
+    ctx.bezierCurveTo(W*.25,H*(y0-.12),W*.5,H*(y1+.08),W*.75,H*(y0-.05));
+    ctx.bezierCurveTo(W*.88,H*(y0-.1),W,H*y1,W,H*y1);
+    ctx.lineTo(W,H);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+  }
+  dune(.55,.5,g[0],.5);dune(.65,.6,g[1],.75);dune(.78,.72,g[2],1);
+  ctx.fillStyle='#a06010';ctx.fillRect(0,H*.82,W,H*.18);
+  ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1.2;
+  for(let i=0;i<3;i++){const y=H*(.85+i*.04);ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(W*.3,y-4,W*.6,y+3,W,y-2);ctx.stroke();}
+}
+
+function drawMangrove(W,H){
+  const gc=ctx.createLinearGradient(0,H*.45,0,H);
+  gc.addColorStop(0,'#1b5e20');gc.addColorStop(.5,'#2e7d32');gc.addColorStop(1,'#1a3a1a');
+  ctx.fillStyle=gc;ctx.fillRect(0,H*.45,W,H*.55);
+  ctx.fillStyle='rgba(2,136,209,0.4)';ctx.fillRect(0,H*.68,W,H*.14);
+  ctx.strokeStyle='#4e2a0a';ctx.lineWidth=2.5;
+  [W*.12,W*.32,W*.52,W*.72,W*.9].forEach(rx=>{
+    ctx.beginPath();ctx.moveTo(rx,H*.48);ctx.bezierCurveTo(rx-28,H*.63,rx+28,H*.63,rx+18,H*.77);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(rx,H*.48);ctx.bezierCurveTo(rx+22,H*.58,rx-18,H*.66,rx-14,H*.77);ctx.stroke();
+  });
+  ctx.fillStyle='rgba(27,94,32,0.55)';
+  [[W*.18,H*.33,115,50],[W*.55,H*.28,95,42],[W*.88,H*.36,75,38]].forEach(([cx,cy,rx,ry])=>{ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);ctx.fill();});
+}
+
+function drawMountains(W,H,b,season){
+  ctx.fillStyle='#37474f';ctx.fillRect(0,H*.58,W,H*.42);
+  const peaks=[{x:W*.08,h:H*.65},{x:W*.3,h:H*.42},{x:W*.54,h:H*.33},{x:W*.76,h:H*.48},{x:W*.93,h:H*.6}];
+  peaks.forEach(p=>{
+    const pw=W*.22;
+    ctx.fillStyle='#546e7a';ctx.beginPath();ctx.moveTo(p.x-pw/2,H*.9);ctx.lineTo(p.x,p.h);ctx.lineTo(p.x+pw/2,H*.9);ctx.closePath();ctx.fill();
+    const sh=(H*.9-p.h)*.3;
+    ctx.fillStyle=season.includes('Winter')?'rgba(230,240,255,0.92)':'rgba(230,240,255,0.62)';
+    ctx.beginPath();ctx.moveTo(p.x,p.h);ctx.lineTo(p.x-pw*.18,p.h+sh);ctx.lineTo(p.x+pw*.18,p.h+sh);ctx.closePath();ctx.fill();
+  });
+}
+
+function drawForest(W,H,b,season){
+  const gc=ctx.createLinearGradient(0,H*.48,0,H);
+  gc.addColorStop(0,'#4e342e');gc.addColorStop(1,'#3e2723');
+  ctx.fillStyle=gc;ctx.fillRect(0,H*.48,W,H*.52);
+  ctx.fillStyle='rgba(27,94,32,0.52)';
+  [W*.06,W*.2,W*.4,W*.6,W*.78,W*.93].forEach((tx,i)=>{
+    ctx.beginPath();ctx.ellipse(tx,H*.36+i%3*H*.05,48+i%2*30,(H*.36+i%3*H*.05)*.28,0,0,Math.PI*2);ctx.fill();
+  });
+  ctx.fillStyle='rgba(78,52,46,0.8)';ctx.fillRect(0,H*.8,W,H*.2);
+}
+
+function drawPlains(W,H,b,season){
+  const gc=ctx.createLinearGradient(0,H*.5,0,H);
+  gc.addColorStop(0,season.includes('Monsoon')?'#7cb342':'#558b2f');
+  gc.addColorStop(.5,'#558b2f');gc.addColorStop(1,'#33691e');
+  ctx.fillStyle=gc;ctx.fillRect(0,H*.5,W,H*.5);
+  ctx.strokeStyle='rgba(255,255,255,0.09)';ctx.lineWidth=1.4;
+  for(let i=0;i<5;i++){const y=H*(.56+i*.07);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.fillStyle='rgba(51,105,30,0.45)';
+  for(let x=0;x<W;x+=W/9){ctx.beginPath();ctx.ellipse(x+W/18,H*.51,22,17,0,0,Math.PI*2);ctx.fill();}
+}
+
+// Rain
+let rainDrops = [];
+function startRain(){
+  rainCanvas.style.display='block';
+  rainDrops=[];
+  for(let i=0;i<80;i++) rainDrops.push({x:Math.random()*rainCanvas.width,y:Math.random()*rainCanvas.height,s:4+Math.random()*6,l:8+Math.random()*10});
+  (function loop(){
+    rainCtx.clearRect(0,0,rainCanvas.width,rainCanvas.height);
+    rainCtx.strokeStyle='rgba(110,170,255,0.32)';rainCtx.lineWidth=1;
+    rainDrops.forEach(d=>{
+      rainCtx.beginPath();rainCtx.moveTo(d.x,d.y);rainCtx.lineTo(d.x-1.5,d.y+d.l);rainCtx.stroke();
+      d.y+=d.s;d.x-=0.4;
+      if(d.y>rainCanvas.height){d.y=-d.l;d.x=Math.random()*rainCanvas.width;}
+    });
+    rainAnim=requestAnimationFrame(loop);
+  })();
+}
+function stopRain(){
+  cancelAnimationFrame(rainAnim);
+  rainCanvas.style.display='none';
+}
+
+window.addEventListener('resize',resizeCanvas);
+
+// ── BIOME SWITCHER ────────────────────────────────────────────
+function switchBiome(id){
+  if(!unlockedBiomes.has(id)){
+    const prev=BIOME_ORDER[BIOME_ORDER.indexOf(id)-1];
+    showFloat(`🔒 Complete ${BIOMES[prev].name} first!`,window.innerWidth/2,window.innerHeight/2,'wrong');
+    return;
+  }
+  currentBiome=id;
+  const b=BIOMES[id];
+  document.querySelectorAll('.biome-pill').forEach(p=>p.classList.toggle('active',p.dataset.biome===id));
+  document.getElementById('biomeName').textContent=b.name;
+  document.getElementById('winBtn').textContent=b.emoji+' Build Again!';
+  buildSidebar(id);
+  placed.forEach(p=>p.el.remove()); placed=[];
+  winShown=false; hintHidden=false;
+  document.getElementById('chainHint').style.opacity='1';
+  drawBg(); updateEcosystem();
+}
+
+function buildSidebar(id){
+  const sb=document.getElementById('sidebar'); sb.innerHTML='';
+  const items=BIOMES[id].items;
+  const animals=Object.entries(items).filter(([,v])=>v.type!=='plant'&&v.type!=='water');
+  const plants= Object.entries(items).filter(([,v])=>v.type==='plant');
+  const waters= Object.entries(items).filter(([,v])=>v.type==='water');
+
+  function sec(label,list){
+    const s=document.createElement('div');s.className='sidebar-section';s.textContent=label;sb.appendChild(s);
+    list.forEach(([itemId,info])=>{
+      const card=document.createElement('div');card.className='item-card';card.dataset.id=itemId;card.draggable=true;
+      card.innerHTML=`<span class="item-emoji">${info.emoji}</span><div class="item-label">${info.label}</div>`;
+      card.addEventListener('dragstart',()=>{ dragging=itemId; ghost.textContent=info.emoji; ghost.style.display='block'; setTimeout(()=>card.classList.add('dragging'),0); });
+      card.addEventListener('dragend',()=>{ card.classList.remove('dragging'); dragging=null; ghost.style.display='none'; });
+      card.addEventListener('touchstart',e=>{ dragging=itemId; ghost.style.display='block'; ghost.textContent=info.emoji; const t=e.touches[0]; ghost.style.left=t.clientX+'px'; ghost.style.top=t.clientY+'px'; },{passive:true});
+      sb.appendChild(card);
+    });
+  }
+  sec('🦁 Animals',animals); sec('🌿 Plants',plants); sec('💧 Water',waters);
+}
+
+// ── SEASON SYSTEM ─────────────────────────────────────────────
+function cycleSeason(){
+  seasonIdx=(seasonIdx+1)%3;
+  const s=SEASONS[seasonIdx];
+  document.getElementById('seasonBadge').textContent=s;
+  if(s.includes('Monsoon')) startRain(); else stopRain();
+  drawBg(); updateEcosystem();
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────
+let dragging=null;
+const ghost=document.getElementById('dragGhost');
+
+document.addEventListener('touchmove',e=>{
+  if(!dragging)return;
+  const t=e.touches[0]; ghost.style.left=t.clientX+'px'; ghost.style.top=t.clientY+'px';
+},{passive:true});
+
+document.addEventListener('touchend',e=>{
+  if(!dragging)return;
+  const t=e.changedTouches[0];
+  const dz=document.getElementById('dropZone');
+  const r=dz.getBoundingClientRect();
+  if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom){
+    dropItem(dragging,t.clientX-r.left,t.clientY-r.top); spawnRipple(t.clientX,t.clientY);
+  }
+  ghost.style.display='none'; dragging=null;
+});
+
+const dropZone=document.getElementById('dropZone');
+dropZone.addEventListener('dragover',e=>e.preventDefault());
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); if(!dragging)return;
+  const r=dropZone.getBoundingClientRect();
+  dropItem(dragging,e.clientX-r.left,e.clientY-r.top); spawnRipple(e.clientX,e.clientY);
+  ghost.style.display='none'; dragging=null;
+});
+
+// ── PLACE / REMOVE ITEMS ──────────────────────────────────────
+function getWaterStyle(id){
+  const map={
+    oasis:  'radial-gradient(ellipse at 50% 32%, #a7ffeb, #00bcd4 52%, #006978)',
+    river:  'radial-gradient(ellipse at 50% 32%, #81d4fa, #0288d1 52%, #01579b)',
+    pond:   'radial-gradient(ellipse at 50% 32%, #b2dfdb, #26a69a 52%, #00564d)',
+    glacier:'radial-gradient(ellipse at 50% 32%, #ffffff, #b3e5fc 50%, #4fc3f7)',
+    stream: 'radial-gradient(ellipse at 50% 32%, #b3e5fc, #039be5 52%, #01579b)',
+  };
+  return map[id]||map.river;
+}
+
+function dropItem(itemId,x,y){
+  const items=BIOMES[currentBiome].items;
+  const info=items[itemId]; if(!info)return;
+  const uid='u'+(uidCounter++);
+  const dh=dropZone.clientHeight, dw=dropZone.clientWidth;
+  const minY=dh*(HORIZON[currentBiome]||0.5);
+  const isSky=info.sky===true;
+  const skyTried = !isSky && y < minY-4;
+  const cx=Math.min(Math.max(x,25),dw-65);
+  let cy;
+  if(isSky){
+    // sky creature: clamp to sky band (top 10px → HORIZON-50px), default to middle-sky if dropped on ground
+    const skyMax=minY-55;
+    cy=Math.min(Math.max(y,20), skyMax);
+    if(y>=minY) cy=20+Math.random()*(skyMax-20); // dropped on ground → auto-place in sky
+  } else {
+    cy=Math.min(Math.max(y,minY),dh-80);
+  }
+  const el=document.createElement('div');
+  const extraClass=isSky?(itemId==='butterfly'?'sky-butterfly':'sky-creature'):'';
+  el.className='placed '+info.type+(extraClass?' '+extraClass:''); el.id=uid;
+  el.style.left=cx+'px'; el.style.top=cy+'px';
+  if(info.type==='water'){
+    el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><div class="water-pool" style="background:${getWaterStyle(itemId)};"><span class="wp-emoji">${info.emoji}</span></div><span class="p-label">${info.label}</span>`;
+  } else if(info.type==='plant'){
+    el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><div class="grow-beam"></div><span class="p-emoji seedling">🌱</span><span class="p-label">${info.label}</span>`;
+    setTimeout(()=>{
+      const em=el.querySelector('.p-emoji'); const bm=el.querySelector('.grow-beam');
+      if(bm) bm.remove();
+      if(em){ em.textContent=info.emoji; em.classList.remove('seedling'); em.style.animation=''; em.classList.add('grown');
+        setTimeout(()=>{ if(em) em.style.animationName='plantSway'; },650); }
+    },4000);
+  } else {
+    const faceInner = info.img
+      ? `<img src="${info.img}" alt="${info.label}" class="animal-img" draggable="false">`
+      : info.emoji;
+    el.innerHTML=`<button class="p-remove" onclick="removeItem('${uid}')">✕</button><span class="p-emoji"><span class="p-face">${faceInner}</span></span><span class="p-label">${info.label}</span>`;
+    if(!isSky) el.querySelector('.p-emoji').style.animationDelay=(Math.random()*1.5)+'s';
+  }
+  el.addEventListener('click',e=>{if(!e.target.classList.contains('p-remove')) showFoodChain(uid,itemId);});
+  dropZone.appendChild(el);
+  placed.push({id:itemId,uid,el,x:cx,y:cy});
+  addScore(10); showFloat(isSky?'🦅 Soaring!':skyTried?'🌍 On the ground!':'+10',cx+60,cy+40,isSky?'info':skyTried?'info':'good'); sfxPlace();
+  if(!hintHidden){hintHidden=true;document.getElementById('chainHint').style.opacity='0';}
+  updateEcosystem(); checkChallenge(itemId);
+}
+
+function removeItem(uid){
+  const i=placed.findIndex(p=>p.uid===uid); if(i===-1)return;
+  placed[i].el.remove(); placed.splice(i,1); sfxRemove(); updateEcosystem();
+}
+
+function clearAll(){
+  placed.forEach(p=>p.el.remove()); placed=[]; winShown=false; hintHidden=false;
+  document.getElementById('chainHint').style.opacity='1';
+  updateEcosystem();
+}
+
+// ── ECOSYSTEM ENGINE ──────────────────────────────────────────
+function updateEcosystem(){
+  const b=BIOMES[currentBiome]; const items=b.items;
+  const counts={}; Object.keys(items).forEach(k=>counts[k]=placed.filter(p=>p.id===k).length);
+  const total=placed.length; const season=SEASONS[seasonIdx];
+  const warnings=[]; let dying=[];
+
+  // 'water' = any water source present; 'grass' = any plant present; else a specific item id
+  const hasWater = b.waterIds.some(w=>counts[w]>0);
+  const hasPlant = b.plantIds.some(p=>counts[p]>0);
+  const needMet = n => n==='water'?hasWater : n==='grass'?hasPlant : counts[n]>0;
+  const needEmoji = n => n==='water'?'💧' : n==='grass'?'🌿' : (items[n]?items[n].emoji:n);
+
+  placed.forEach(p=>{
+    const info=items[p.id]; if(!info)return;
+    let needy=false;
+    (info.needs||[]).forEach(n=>{
+      if(!needMet(n)){needy=true; warnings.push(`${info.emoji} ${info.label} needs ${needEmoji(n)}!`);}
+    });
+    if(info.eats&&info.eats.length>0&&info.type!=='plant'&&info.type!=='water'){
+      if(!info.eats.some(f=>counts[f]>0)){warnings.push(`${info.emoji} ${info.label} has nothing to eat! 😢`);needy=true;}
+    }
+    if(needy) dying.push(p.uid);
+  });
+
+  Object.entries(counts).forEach(([id,cnt])=>{
+    const info=items[id]; if(!info)return;
+    if(cnt>=3&&info.type==='predator') warnings.push(`Too many ${info.emoji} — prey will disappear!`);
+    if(cnt>=4&&info.type==='herbivore') warnings.push(`Too many ${info.emoji} — they'll eat all plants!`);
+  });
+
+  const uniq=[...new Set(warnings)];
+
+  placed.forEach(p=>{
+    const info=items[p.id]; if(!info)return;
+    const em=p.el.querySelector('.p-emoji');
+    if(!em)return; // water pools have no .p-emoji and never die
+    p.el.classList.remove('dying');
+    em.style.filter='drop-shadow(1px 4px 5px rgba(0,0,0,0.55))';
+    if(dying.includes(p.uid)){p.el.classList.add('dying');}
+    else{em.style.animationName=info.type==='plant'?'plantSway':'idleFloat';}
+  });
+
+  // Balance — a real food web needs DIVERSITY at each level, everyone fed, and size.
+  const nPlants      = b.plantIds.filter(p=>counts[p]>0).length;   // distinct plant species
+  const nHerbs       = b.herbIds.filter(h=>counts[h]>0).length;    // distinct herbivore species
+  const nPreds       = b.predIds.filter(p=>counts[p]>0).length;    // distinct predator species
+  const nAnimals     = placed.filter(p=>{const t=items[p.id]&&items[p.id].type;return t&&t!=='plant'&&t!=='water';}).length;
+  const allFed       = nAnimals>0 && dying.length===0;             // sustainability
+  let bal=0;
+  if(total>0){
+    if(hasWater) bal+=20;
+    bal += Math.min(nPlants,3)*15;  // max 45
+    bal += Math.min(nHerbs,3)*10;   // max 30
+    bal += Math.min(nPreds,2)*8;    // max 16
+    if(allFed) bal+=12;
+    if(total>=8)  bal+=5;
+    if(season.includes('Monsoon')&&hasWater) bal+=5;
+    if(season.includes('Winter')&&['bear','elephant'].some(a=>counts[a]>0)) bal+=4;
+    if(!allFed) bal -= Math.min(dying.length*8, 30);
+    bal=Math.max(0,Math.min(100,bal));
+  }
+
+  const fill=document.getElementById('balFill'); const bt=document.getElementById('balText');
+  fill.style.width=bal+'%';
+  fill.classList.toggle('live',bal>0);
+  if(bal===0){fill.style.background='#1a2030';bt.textContent='Empty — add some life!';}
+  else if(bal<30){fill.style.background='linear-gradient(90deg,#b71c1c,#ff1744)';bt.textContent='Struggling ⚠️';}
+  else if(bal<60){fill.style.background='linear-gradient(90deg,#e65100,#ff9100)';bt.textContent='Getting better 🌱';}
+  else if(bal<85){fill.style.background='linear-gradient(90deg,#2e7d32,#00e676)';bt.textContent='Almost there! 🌿';}
+  else{fill.style.background='linear-gradient(90deg,#00c853,#69f0ae)';bt.textContent='BALANCED! 🏆';}
+
+  const feed=document.getElementById('feedMsg');
+  if(total===0) feed.innerHTML='Start by adding <strong>plants 🌿</strong> and <strong>water 💧</strong>!';
+  else if(uniq.length>0) feed.innerHTML='⚠️ '+uniq.slice(0,2).map(w=>`<strong>${w}</strong>`).join(' &nbsp;|&nbsp; ');
+  else{
+    const facts=(b.positiveFacts||[]).filter(f=>f.needs.every(n=>counts[n]>0));
+    feed.innerHTML=facts.length>0?'✅ '+facts[Math.floor(Math.random()*facts.length)].msg:'🌿 Great start! Add more variety to balance the ecosystem.';
+  }
+
+  // Pop display
+  const pd=document.getElementById('popDisplay'); pd.innerHTML='';
+  Object.entries(counts).filter(([,v])=>v>0).forEach(([id,cnt])=>{
+    const info=items[id]; if(!info)return;
+    const r=document.createElement('div'); r.className='pop-row';
+    r.innerHTML=`${info.emoji} <span>${cnt}</span>`; pd.appendChild(r);
+  });
+
+  maybeGroupChallenge(counts);
+
+  // WIN: a real food web — diversity at every trophic level, everyone fed, enough variety.
+  const balancedWeb = bal>=75 && total>=8 && nPlants>=2 && nHerbs>=2 && nPreds>=1 && allFed;
+  if(balancedWeb&&!winShown){winShown=true;addScore(200);setTimeout(showWin,1200);}
+
+  updateWinHints(hasWater,nPlants,nHerbs,nPreds,total,allFed);
+}
+
+// ── FOOD CHAIN VISUALISER ─────────────────────────────────────
+let chainTimer=null;
+function showFoodChain(uid,itemId){
+  const items=BIOMES[currentBiome].items;
+  const info=items[itemId]; if(!info||info.type==='plant'||info.type==='water')return;
+  const src=placed.find(p=>p.uid===uid); if(!src)return;
+  const svg=document.getElementById('chainSvg'); svg.innerHTML='';
+  const overlay=document.getElementById('chainOverlay');
+  const sc={x:src.x+20,y:src.y+20};
+  const lines=[];
+
+  placed.forEach(t=>{
+    if(t.uid===uid)return;
+    const ti=items[t.id]; if(!ti)return;
+    const tc={x:t.x+20,y:t.y+20};
+    let color=null,rel=null;
+    if((info.eats||[]).includes(t.id)){color='#ef5350';rel=`${info.emoji} ${info.label} eats ${ti.emoji} ${ti.label}`;}
+    else if((info.eatenBy||[]).includes(t.id)){color='#42a5f5';rel=`${ti.emoji} ${ti.label} eats ${info.emoji} ${info.label}`;}
+    if(!color)return;
+    const mid=`M${sc.x},${sc.y} Q${(sc.x+tc.x)/2},${Math.min(sc.y,tc.y)-35} ${tc.x},${tc.y}`;
+    const mid2=`${(sc.x+tc.x)/2},${Math.min(sc.y,tc.y)-35}`;
+    const mId='mk'+Math.random().toString(36).slice(2,8);
+    svg.innerHTML+=`<defs><marker id="${mId}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0,7 3.5,0 7" fill="${color}"/></marker></defs>
+      <path d="${mid}" stroke="${color}" stroke-width="2.2" fill="none" stroke-dasharray="5,3" marker-end="url(#${mId})" opacity="0.85"/>`;
+    if(rel) lines.push(rel);
+  });
+
+  const tip=document.getElementById('chainTooltip');
+  tip.innerHTML=lines.length?lines.join('<br>'):`${info.emoji} ${info.label} — tap others to see connections`;
+  const rect=dropZone.getBoundingClientRect();
+  tip.style.left=Math.min(rect.left+sc.x+40,window.innerWidth-220)+'px';
+  tip.style.top=Math.max(rect.top+sc.y-30,50)+'px';
+  tip.classList.add('show'); overlay.classList.add('show');
+  clearTimeout(chainTimer);
+  chainTimer=setTimeout(()=>{overlay.classList.remove('show');tip.classList.remove('show');},2500);
+}
+
+// ── CHALLENGE SYSTEM ──────────────────────────────────────────
+function showQuiz(ch){
+  const reward = ch.reward||50;
+  const ov=document.getElementById('challengeOverlay');
+  ov.classList.toggle('group', ch.type==='GROUP');
+  document.getElementById('ch-type').textContent =
+    ch.type==='MATHS'?'🔢 MATHS CHALLENGE':ch.type==='GROUP'?'👥 GROUP CHALLENGE':'🔬 SCIENCE CHALLENGE';
+  document.getElementById('ch-q').textContent=ch.q;
+  document.getElementById('ch-fb').textContent='';
+  document.getElementById('ch-btn').style.display='none';
+  const oe=document.getElementById('ch-opts'); oe.innerHTML='';
+  ch.opts.forEach((o,i)=>{
+    const btn=document.createElement('button'); btn.className='ch-opt'; btn.textContent=o;
+    btn.onclick=()=>{
+      oe.querySelectorAll('.ch-opt').forEach(b=>b.onclick=null);
+      const fb=document.getElementById('ch-fb');
+      oe.querySelectorAll('.ch-opt')[ch.correct].classList.add('correct');
+      if(i===ch.correct){btn.classList.add('correct');fb.innerHTML='🌟 Sahi! '+ch.explain;fb.style.color='#81c784';addScore(reward);burstStars();sfxCorrect();}
+      else{btn.classList.add('wrong');fb.innerHTML='❌ Not quite! '+ch.explain;fb.style.color='#ef9a9a';sfxWrong();}
+      document.getElementById('ch-btn').style.display='block';
+    };
+    oe.appendChild(btn);
+  });
+  ov.classList.add('show');
+}
+
+function checkChallenge(itemId){
+  const ch=BIOMES[currentBiome].challenges.find(c=>c.trigger===itemId);
+  if(!ch)return;
+  const key=currentBiome+'_'+itemId;
+  if(challengesDone.has(key))return;
+  challengesDone.add(key);
+  setTimeout(()=>showQuiz(ch),800);
+}
+
+// Group / collective-noun challenge: fires once when a species reaches 3+ on the canvas.
+function maybeGroupChallenge(counts){
+  if(document.getElementById('challengeOverlay').classList.contains('show')) return; // wait for free modal
+  for(const id in counts){
+    if(counts[id]>=3 && GROUPS[id] && !groupsDone.has(id)){
+      groupsDone.add(id);
+      const g=GROUPS[id];
+      setTimeout(()=>showQuiz({type:'GROUP',q:g.q,opts:g.opts,correct:g.correct,explain:g.fact,reward:40}),600);
+      return; // one at a time
+    }
+  }
+}
+
+function closeChallenge(){ document.getElementById('challengeOverlay').classList.remove('show'); }
+
+// ── SCORE & RANKS ─────────────────────────────────────────────
+function addScore(pts){
+  score+=pts;
+  document.getElementById('scoreNum').textContent=score;
+  const p=document.getElementById('scorePill'); p.style.transform='scale(1.5)';
+  setTimeout(()=>p.style.transform='scale(1)',280);
+  let ri=0; for(let i=0;i<RANKS.length;i++){if(score>=RANKS[i].min)ri=i;}
+  const rb=document.getElementById('rankBadge'); rb.textContent=RANKS[ri].label;
+  if(ri>lastRank){lastRank=ri;rb.style.transform='scale(1.5)';showFloat('🎖️ '+RANKS[ri].label,window.innerWidth/2-70,70,'info');sfxRank();setTimeout(()=>rb.style.transform='scale(1)',400);}
+}
+
+// ── WIN SCREEN ────────────────────────────────────────────────
+// ── CONFETTI ─────────────────────────────────────────────────
+let confettiRaf=null;
+function startConfetti(){
+  const cv=document.getElementById('confettiCanvas');
+  if(!cv)return;
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const COLS=['#ffd740','#ff9100','#00e676','#40c4ff','#c084fc','#ff1744','#26c6da','#f5a623'];
+  const pts=Array.from({length:130},()=>({
+    x:Math.random()*cv.width, y:-20-Math.random()*120,
+    w:5+Math.random()*9, h:7+Math.random()*6,
+    col:COLS[Math.floor(Math.random()*COLS.length)],
+    rot:Math.random()*360, vx:(Math.random()-0.5)*4,
+    vy:2.2+Math.random()*4.5, vr:(Math.random()-0.5)*9,
+  }));
+  let frame=0;
+  function tick(){
+    frame++;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.vy+=0.04;
+      ctx.save();
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.col; ctx.globalAlpha=Math.max(0,1-frame/280);
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+      if(p.y>cv.height+20&&frame<200){p.y=-20;p.x=Math.random()*cv.width;p.vy=2.2+Math.random()*4.5;}
+    });
+    if(frame<380) confettiRaf=requestAnimationFrame(tick);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  if(confettiRaf) cancelAnimationFrame(confettiRaf);
+  confettiRaf=requestAnimationFrame(tick);
+}
+
+function updateWinHints(hasWater,nPlants,nHerbs,nPreds,total,allFed){
+  const el=document.getElementById('winHints'); if(!el)return;
+  const h=(ok,txt)=>`<span class="${ok?'hint-ok':'hint-no'}">${ok?'✅':'❌'} ${txt}</span>`;
+  el.innerHTML=[
+    h(hasWater,'Water'),
+    h(nPlants>=2,`${nPlants}/2 Plants`),
+    h(nHerbs>=2,`${nHerbs}/2 Herbivores`),
+    h(nPreds>=1,'Predator'),
+    h(total>=8,`${total}/8 Items`),
+    h(allFed,'All fed'),
+  ].join('');
+}
+
+function updateBiomePills(){
+  document.querySelectorAll('.biome-pill').forEach(p=>{
+    const biome=p.dataset.biome;
+    const locked=!unlockedBiomes.has(biome);
+    p.classList.toggle('locked',locked);
+    p.disabled=locked;
+    const b=BIOMES[biome];
+    const done=completedBiomes.has(biome);
+    p.textContent=locked?`🔒 ${b.name}`:(done?`✅ ${b.emoji} ${b.name}`:`${b.emoji} ${b.name}`);
+  });
+}
+
+function showWin(){
+  const b=BIOMES[currentBiome];
+  completedBiomes.add(currentBiome);
+  const idx=BIOME_ORDER.indexOf(currentBiome);
+  const nextBiome=BIOME_ORDER[idx+1];
+  let nextMsg='';
+  if(nextBiome&&!unlockedBiomes.has(nextBiome)){
+    unlockedBiomes.add(nextBiome);
+    updateBiomePills();
+    nextMsg=`<br><br>🎉 <strong>${BIOMES[nextBiome].name}</strong> biome unlocked!`;
+  } else if(!nextBiome){
+    nextMsg='<br><br>🌏 You\'ve completed ALL 5 biomes! Master Ecologist! 🏅';
+  }
+  document.getElementById('winSub').innerHTML=`You built a balanced <strong>${b.name}</strong> ecosystem with ${placed.length} elements!<br>Final Score: <strong style="color:#ffd700">⭐ ${score} pts</strong>${nextMsg}`;
+  document.getElementById('winScreen').classList.add('show'); sfxWin();
+  updateBiomePills(); startConfetti();
+}
+document.getElementById('winBtn').onclick=()=>{document.getElementById('winScreen').classList.remove('show');clearAll();winShown=false;};
+
+// ── UI HELPERS ────────────────────────────────────────────────
+function showFloat(text,x,y,type){
+  const el=document.createElement('div'); el.className='float-popup '+type; el.textContent=text;
+  el.style.left=Math.min(Math.max(x,5),window.innerWidth-140)+'px';
+  el.style.top=Math.max(y,5)+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1300);
+}
+function burstStars(){
+  const em=['⭐','🌟','✨','🎉'];
+  for(let i=0;i<6;i++) setTimeout(()=>{
+    const el=document.createElement('div'); el.className='float-popup good';
+    el.style.cssText=`left:${8+Math.random()*72}%;top:${8+Math.random()*45}%;background:transparent;box-shadow:none;font-size:1.7rem;`;
+    el.textContent=em[i%4]; document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
+  },i*100);
+}
+function spawnRipple(x,y){
+  const el=document.createElement('div'); el.className='ripple';
+  el.style.left=x+'px'; el.style.top=y+'px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),500);
+}
+
+document.addEventListener('touchmove',e=>{if(dragging)e.preventDefault();},{passive:false});
+
+// ── AUDIO (synthesised, no external files) ────────────────────
+let audioCtx=null, soundOn=true;
+function initAudio(){
+  if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; } }
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇';
+  if(soundOn){ initAudio(); blip(660,0.12,'sine',0.15); }
+}
+function blip(freq,dur,type,vol,when){
+  if(!soundOn||!audioCtx)return;
+  const t0=audioCtx.currentTime+(when||0);
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type||'sine'; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(vol||0.15,t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t0); o.stop(t0+dur+0.03);
+}
+function sfxPlace(){ initAudio(); blip(440,0.12,'sine',0.18); blip(660,0.10,'sine',0.12,0.05); }
+function sfxRemove(){ initAudio(); blip(320,0.12,'sine',0.13); blip(200,0.12,'sine',0.10,0.05); }
+function sfxCorrect(){ initAudio(); [523,659,784,1047].forEach((f,i)=>blip(f,0.18,'triangle',0.16,i*0.08)); }
+function sfxWrong(){ initAudio(); blip(190,0.26,'sawtooth',0.13); blip(150,0.30,'sawtooth',0.11,0.07); }
+function sfxWin(){ initAudio(); [523,659,784,1047,1319,1047,1319].forEach((f,i)=>blip(f,0.32,'triangle',0.18,i*0.13)); }
+function sfxRank(){ initAudio(); [784,1047,1319].forEach((f,i)=>blip(f,0.22,'sine',0.16,i*0.07)); }
+// Unlock audio on first user gesture (browser autoplay policy)
+window.addEventListener('pointerdown',initAudio,{once:true});
+window.addEventListener('touchstart',initAudio,{once:true});
+
+// ── ANIMAL WANDERING ──────────────────────────────────────────
+// Animals stroll back & forth along the ground and flip to face their direction.
+function wanderTick(){
+  const items=BIOMES[currentBiome].items;
+  const dw=dropZone.clientWidth, dh=dropZone.clientHeight; if(!dw) return;
+  const minY=dh*(HORIZON[currentBiome]||0.5);
+  placed.forEach(p=>{
+    const info=items[p.id]; if(!info) return;
+    if(info.type==='plant'||info.type==='water') return;
+    if(p.el.classList.contains('dying')) return;
+    if(Math.random()<0.4) return;
+    if(info.sky){
+      // Sky creatures drift freely in 2D across the sky band
+      const xRange=60+Math.random()*160;
+      const yRange=20+Math.random()*60;
+      let nx=p.x+(Math.random()<0.5?-1:1)*xRange;
+      let ny=p.y+(Math.random()<0.5?-1:1)*yRange;
+      nx=Math.min(Math.max(nx,15),dw-70);
+      ny=Math.min(Math.max(ny,15),minY-55);
+      const dist=Math.sqrt((nx-p.x)**2+(ny-p.y)**2);
+      if(dist<15) return;
+      const dur=Math.max(1.8,dist/55);
+      p.el.style.transition=`left ${dur}s ease-in-out, top ${dur}s ease-in-out`;
+      const face=p.el.querySelector('.p-face');
+      if(face) face.style.transform=`scaleX(${nx<p.x?-1:1})`;
+      p.el.style.left=nx+'px'; p.el.style.top=ny+'px';
+      p.x=nx; p.y=ny;
+    } else {
+      // Ground animals: horizontal wander only
+      const range=40+Math.random()*100;
+      let nx=p.x+(Math.random()<0.5?-1:1)*range;
+      nx=Math.min(Math.max(nx,10),dw-65);
+      const dist=Math.abs(nx-p.x);
+      if(dist<10) return;
+      const dur=Math.max(1.2,dist/45);
+      p.el.style.transition='left '+dur+'s linear';
+      const face=p.el.querySelector('.p-face');
+      if(face) face.style.transform='scaleX('+(nx<p.x?-1:1)+')';
+      p.el.style.left=nx+'px'; p.x=nx;
+    }
+  });
+}
+setInterval(wanderTick,2200);
+
+// ── INIT ──────────────────────────────────────────────────────
+updateBiomePills();
+switchBiome('thar');
+resizeCanvas();
+</script>
+</body>
+</html>
