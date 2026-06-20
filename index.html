@@ -1143,7 +1143,7 @@ function dropItem(itemId,x,y){
   else if(info.type!=='water'&&info.type!=='shelter') sfxAnimal(itemId);
   if(!hintHidden){hintHidden=true;document.getElementById('chainHint').style.opacity='0';}
   updateEcosystem(); checkChallenge(itemId);
-  if(info.v!==undefined && !classifiedAnimals.has(itemId)){
+  if(info.v!==undefined && !classifiedAnimals.has(itemId) && Math.random()<0.4 && quizQueue.length===0){
     enqueueQuiz(()=>showClassifyQuiz(itemId));
   }
 }
