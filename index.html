@@ -354,6 +354,12 @@ body{font-family:'Nunito',sans-serif;background:var(--dark);display:flex;flex-di
 #challengeOverlay.group .ch-box{border-color:rgba(192,132,252,0.35);background:linear-gradient(145deg,#0a0618,#170e2a);}
 #challengeOverlay.group .ch-type{color:var(--purple);}
 #challengeOverlay.group .ch-opt:hover{background:rgba(192,132,252,0.12);border-color:rgba(192,132,252,0.45);}
+#challengeOverlay.hindi .ch-box{border-color:rgba(255,171,64,0.38);background:linear-gradient(145deg,#0c0a04,#1a1204);}
+#challengeOverlay.hindi .ch-type{color:#ffab40;}
+#challengeOverlay.hindi .ch-opt:hover{background:rgba(255,171,64,0.12);border-color:rgba(255,171,64,0.45);}
+#challengeOverlay.habitat .ch-box{border-color:rgba(105,240,174,0.32);background:linear-gradient(145deg,#04100a,#061a0e);}
+#challengeOverlay.habitat .ch-type{color:#69f0ae;}
+#challengeOverlay.habitat .ch-opt:hover{background:rgba(105,240,174,0.1);border-color:rgba(105,240,174,0.4);}
 .ch-q{font-family:'Baloo 2',cursive;font-size:1.08rem;color:#e0e8f8;margin-bottom:14px;line-height:1.5;}
 .ch-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
 .ch-opt{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 8px;text-align:center;font-family:'Baloo 2',cursive;font-size:0.92rem;color:#8a9bb5;cursor:pointer;transition:all 0.2s;line-height:1.4;}
@@ -553,11 +559,16 @@ const BIOMES = {
       rockshade:{emoji:'🪨',label:'Chattan',eats:[],eatenBy:[],                       needs:[],    type:'shelter', shelterFor:['camel','peacock','eagle']},
     },
     challenges:[
-      {trigger:'snake', type:'MATHS',q:'3 snakes each eat 2 mice per day. How many mice eaten in ONE WEEK?',opts:['28 mice','42 mice','14 mice','21 mice'],correct:1,explain:'3×2×7 = 42 mice! 🐍'},
-      {trigger:'camel', type:'SCIENCE',q:'Why do camels have broad flat feet?',opts:['Kick predators','🏜️ Walk on soft sand','Swim in oasis','Dig underground'],correct:1,explain:'Wide flat feet spread weight on soft sand — natural sandshoes! 🐪'},
-      {trigger:'oasis', type:'MATHS',q:'Oasis holds 300L. 2 camels drink 50L each, 4 peacocks drink 5L each. How much LEFT?',opts:['200L','180L','100L','220L'],correct:1,explain:'2×50+4×5=120L drunk. 300−120=180L left! 💧'},
-      {trigger:'mouse', type:'SCIENCE',q:'What happens if ALL snakes are removed from the desert?',opts:['Mice disappear','🐭 Mice overpopulate!','Nothing changes','Eagles leave'],correct:1,explain:'Without predators, prey overpopulates and destroys plants! 🌿'},
-      {trigger:'eagle', type:'MATHS',q:'Peacock eats 3 snakes/week, eagle eats 2. Together in 2 weeks?',opts:['10 snakes','20 snakes','8 snakes','15 snakes'],correct:0,explain:'(3+2)×2 = 10 snakes! 🦚🦅'},
+      {trigger:'snake',   type:'MATHS',   q:'3 snakes each eat 2 mice per day. How many mice eaten in ONE WEEK?',opts:['28 mice','42 mice','14 mice','21 mice'],correct:1,explain:'3×2×7 = 42 mice! 🐍'},
+      {trigger:'camel',   type:'SCIENCE', q:'Why do camels have broad flat feet?',opts:['Kick predators','🏜️ Walk on soft sand','Swim in oasis','Dig underground'],correct:1,explain:'Wide flat feet spread weight on soft sand — natural sandshoes! 🐪'},
+      {trigger:'oasis',   type:'MATHS',   q:'Oasis holds 300L. 2 camels drink 50L each, 4 peacocks drink 5L each. How much LEFT?',opts:['200L','180L','100L','220L'],correct:1,explain:'2×50+4×5=120L drunk. 300−120=180L left! 💧'},
+      {trigger:'mouse',   type:'SCIENCE', q:'What happens if ALL snakes are removed from the desert?',opts:['Mice disappear','🐭 Mice overpopulate!','Nothing changes','Eagles leave'],correct:1,explain:'Without predators, prey overpopulates and destroys plants! 🌿'},
+      {trigger:'eagle',   type:'MATHS',   q:'Peacock eats 3 snakes/week, eagle eats 2. Together in 2 weeks?',opts:['10 snakes','20 snakes','8 snakes','15 snakes'],correct:0,explain:'(3+2)×2 = 10 snakes! 🦚🦅'},
+      {trigger:'peacock', type:'HINDI',   q:"What does 'Mor' (मोर) mean in English?",opts:['Crane','Peacock','Parrot','Flamingo'],correct:1,explain:"'Mor' means Peacock — India's national bird, famous for its dance! 🦚"},
+      {trigger:'fox',     type:'HINDI',   q:"What does 'Lomdi' (लोमड़ी) mean in English?",opts:['Wolf','Jackal','Fox','Hyena'],correct:2,explain:"'Lomdi' means Fox — the cleverest trickster of the Thar! 🦊"},
+      {trigger:'grass',   type:'HABITAT', q:'Desert grass survives drought by:',opts:['Stopping growth','Growing deep roots to find water','Becoming a cactus','Storing water in leaves'],correct:1,explain:'Desert grasses grow extra-deep roots — some reach 10 metres underground! 🌾'},
+      {trigger:'cactus',  type:'HABITAT', q:'Why does cactus have spines instead of normal leaves?',opts:['To look scary','To climb rocks','Reduce water loss & collect morning dew','Grow faster in sun'],correct:2,explain:'Spines reduce evaporation and collect dew at night — desert survival! 🌵'},
+      {trigger:'shrub',   type:'HINDI',   q:"What does 'Jhaadi' (झाड़ी) mean in English?",opts:['Tall tree','Grass','Shrub / Bush','Flower'],correct:2,explain:"'Jhaadi' means Shrub or Bush — desert shrubs shelter many small creatures! 🌿"},
     ],
     waterIds:['oasis'], plantIds:['grass','cactus','shrub'], herbIds:['mouse','camel','peacock'], predIds:['snake','eagle','fox'],
     shelterDefs:[{id:'burrow',xFrac:0.38,label:'Sand Burrow'},{id:'rockshade',xFrac:0.70,label:'Rock Shade'}],
@@ -809,6 +820,17 @@ function skipTutorial(){
 let shownFactSpecies = '';
 let shownFact = null;
 
+// ── CLASSIFY PENDING QUEUE ────────────────────────────────────
+// Every animal placed gets added here; drains one-at-a-time during quiet moments.
+let pendingClassifies = [];
+setInterval(()=>{
+  if(quizBusy || quizQueue.length>0 || !pendingClassifies.length) return;
+  const itemId = pendingClassifies.shift();
+  if(classifiedAnimals.has(itemId)) return;          // already done, skip
+  if(!placed.some(p=>p.id===itemId)) return;         // removed from canvas, skip
+  enqueueQuiz(()=>showClassifyQuiz(itemId));
+}, 10000);
+
 // ── WIND SFX STATE ─────────────────────────────────────────────
 let windSrc = null, windGain = null;
 
@@ -1003,7 +1025,7 @@ function switchBiome(id){
   buildSidebar(id);
   placed.forEach(p=>p.el.remove()); placed=[];
   winShown=false; hintHidden=false;
-  shownFactSpecies=''; shownFact=null;
+  shownFactSpecies=''; shownFact=null; pendingClassifies=[];
   document.getElementById('chainHint').style.opacity='1';
   document.getElementById('undoBtn').disabled=true;
   drawBg(); updateEcosystem();
@@ -1143,8 +1165,8 @@ function dropItem(itemId,x,y){
   else if(info.type!=='water'&&info.type!=='shelter') sfxAnimal(itemId);
   if(!hintHidden){hintHidden=true;document.getElementById('chainHint').style.opacity='0';}
   updateEcosystem(); checkChallenge(itemId);
-  if(info.v!==undefined && !classifiedAnimals.has(itemId) && Math.random()<0.4 && quizQueue.length===0){
-    enqueueQuiz(()=>showClassifyQuiz(itemId));
+  if(info.v!==undefined && !classifiedAnimals.has(itemId) && !pendingClassifies.includes(itemId)){
+    pendingClassifies.push(itemId);
   }
 }
 
@@ -1156,7 +1178,7 @@ function removeItem(uid){
 
 function clearAll(){
   placed.forEach(p=>p.el.remove()); placed=[]; winShown=false; hintHidden=false;
-  shownFactSpecies=''; shownFact=null;
+  shownFactSpecies=''; shownFact=null; pendingClassifies=[];
   document.getElementById('chainHint').style.opacity='1';
   document.getElementById('undoBtn').disabled=true;
   clearQuizQueue();
@@ -1331,9 +1353,16 @@ function showFoodChain(uid,itemId){
 function showQuiz(ch){
   const reward = ch.reward||50;
   const ov=document.getElementById('challengeOverlay');
-  ov.classList.toggle('group', ch.type==='GROUP');
+  ov.classList.remove('group','hindi','habitat');
+  if(ch.type==='GROUP')   ov.classList.add('group');
+  if(ch.type==='HINDI')   ov.classList.add('hindi');
+  if(ch.type==='HABITAT') ov.classList.add('habitat');
   document.getElementById('ch-type').textContent =
-    ch.type==='MATHS'?'🔢 MATHS CHALLENGE':ch.type==='GROUP'?'👥 GROUP CHALLENGE':'🔬 SCIENCE CHALLENGE';
+    ch.type==='MATHS'?'🔢 MATHS CHALLENGE':
+    ch.type==='GROUP'?'👥 GROUP CHALLENGE':
+    ch.type==='HINDI'?'🇮🇳 HINDI CHALLENGE':
+    ch.type==='HABITAT'?'🗺️ HABITAT CHALLENGE':
+    '🔬 SCIENCE CHALLENGE';
   document.getElementById('ch-q').textContent=ch.q;
   document.getElementById('ch-fb').textContent='';
   document.getElementById('ch-btn').style.display='none';
